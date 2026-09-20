@@ -1,0 +1,16 @@
+# app-ads.txt for Nimbleknot
+#
+# This file tells ad buyers which sellers are authorised to sell the ad
+# inventory of apps published by Nimbleknot. Many buyers will not bid on
+# inventory they cannot verify this way, so a missing or wrong file quietly
+# lowers what the apps earn rather than breaking anything visibly.
+#
+# It must sit at the ROOT of the domain named as the developer website in the
+# Play listing - crawlers strip to the root and never look in a sub-folder -
+# which is why it is here and not in /logictrio/ with the policy pages.
+#
+# Format: <ad system>, <publisher id>, <relationship>, <certification id>
+# The last field is Google's own TAG certification id and is the same for
+# every publisher.
+
+google.com, pub-7178013201910769, DIRECT, f08c47fec0942fa0
