@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Logic Trio — Nimbleknot</title>
+<meta name="description" content="Logic Trio is a free Android puzzle game from Nimbleknot: a page of three short logic puzzles every day. No lives, no timers, no energy.">
+<style>
+  :root {
+    color-scheme: light dark;
+    --paper: #FAF7F2;
+    --surface: #FFFFFF;
+    --ink: #1F2433;
+    --ink-muted: #5A5F6E;
+    --accent: #B86E00;
+    --accent-line: #F2A93B;
+    --rule: #E3DCD1;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --paper: #12141C;
+      --surface: #1C1F2B;
+      --ink: #ECEEF5;
+      --ink-muted: #9AA0B4;
+      --accent: #FFBE5C;
+      --accent-line: #FFBE5C;
+      --rule: #2E3242;
+    }
+  }
+  * { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; }
+  body {
+    background: var(--paper);
+    color: var(--ink);
+    font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    font-size: 17px;
+    line-height: 1.65;
+    margin: 0;
+    padding: 0 16px 72px;
+    overflow-wrap: break-word;
+  }
+  .page { max-width: 36rem; margin: 0 auto; }
+  .masthead { padding-top: 40px; }
+  .wordmark {
+    font-family: Georgia, "Iowan Old Style", "Times New Roman", Times, serif;
+    font-size: 0.95rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--ink-muted);
+    margin: 0;
+  }
+  h1, h2, h3 {
+    font-family: Georgia, "Iowan Old Style", "Times New Roman", Times, serif;
+    font-weight: 600;
+    line-height: 1.25;
+  }
+  h1 { font-size: 2.1rem; margin: 20px 0 6px; letter-spacing: -0.01em; }
+  h2 {
+    font-size: 1.3rem;
+    margin: 48px 0 14px;
+    padding-top: 26px;
+    border-top: 1px solid var(--rule);
+  }
+  h3 { font-size: 1.08rem; margin: 30px 0 4px; }
+  .standfirst {
+    font-family: Georgia, "Iowan Old Style", "Times New Roman", Times, serif;
+    font-size: 1.15rem;
+    color: var(--ink-muted);
+    margin: 0;
+  }
+  .accent-rule {
+    width: 56px;
+    height: 3px;
+    background: var(--accent-line);
+    margin: 22px 0 28px;
+  }
+  p { margin: 0 0 1.05em; }
+  ul { margin: 0 0 1.05em; padding-left: 1.2em; }
+  li { margin-bottom: 0.5em; }
+  .rule-text { color: var(--ink-muted); margin: 0 0 1.05em; }
+  .notice {
+    background: var(--surface);
+    border: 1px solid var(--rule);
+    border-left: 3px solid var(--accent-line);
+    padding: 16px 18px;
+    margin: 0 0 1.05em;
+  }
+  .notice p:last-child { margin-bottom: 0; }
+  .updated { color: var(--ink-muted); font-size: 0.95rem; margin: 0 0 1.4em; }
+  .backlink { margin: 18px 0 0; font-size: 0.95rem; }
+  a { color: var(--ink); text-decoration: underline; text-decoration-color: var(--accent-line); text-decoration-thickness: 2px; text-underline-offset: 3px; }
+  a:hover { color: var(--accent); }
+  a:focus { outline: 3px solid var(--accent); outline-offset: 3px; }
+  a:focus:not(:focus-visible) { outline: none; }
+  a:focus-visible { outline: 3px solid var(--accent); outline-offset: 3px; }
+  footer {
+    margin-top: 56px;
+    padding-top: 26px;
+    border-top: 1px solid var(--rule);
+    color: var(--ink-muted);
+    font-size: 0.95rem;
+  }
+  footer p { margin: 0 0 0.5em; }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <header class="masthead">
+    <p class="wordmark">Nimbleknot</p>
+  </header>
+
+  <main>
+    <h1>Logic Trio</h1>
+    <p class="standfirst">Three short logic puzzles, every day.</p>
+    <div class="accent-rule"></div>
+
+    <p>Logic Trio is a free puzzle game for Android. Every day it sets a page of three puzzles, one of each kind, and every puzzle has exactly one solution. In crowns and in suns and moons you never have to guess — each can be reasoned out from the rules alone. Solve one of the three to keep your streak, or all three for a gold day.</p>
+
+    <p>There are no lives, no timers and no energy. Nothing is lost by a mistake: undo and check are always free, and a hint explains its reasoning. The game is paid for by advertising.</p>
+
+    <h2>The three puzzles</h2>
+
+    <h3>Crowns</h3>
+    <p class="rule-text">One crown in every row, column and colour. Crowns never touch, not even diagonally.</p>
+
+    <h3>Suns &amp; Moons</h3>
+    <p class="rule-text">As many suns as moons in every row and column. Never three alike in a row.</p>
+
+    <h3>Paths</h3>
+    <p class="rule-text">Draw one line from 1 to the last number, through the numbers in order, filling every cell.</p>
+
+    <h2>Also in the game</h2>
+    <ul>
+      <li>A daily page since 17 September 2026, kept in a monthly calendar, with a streak and a trophy for each month.</li>
+      <li>3&nbsp;600 hand-checked levels across the three games — 1&nbsp;200 in each, in four difficulties — and the levels never run out.</li>
+      <li>Seven languages: English, Hindi, Portuguese, Spanish, Indonesian, German and French.</li>
+      <li>A light theme and a dark one, patterns for colour-blind players, and a share card for the day you have just finished.</li>
+    </ul>
+
+    <h2>Where to get it</h2>
+    <div class="notice">
+      <p><strong>Coming soon to Google Play.</strong></p>
+      <p>Logic Trio is not published yet, so there is nothing to link to. When it is on Google Play, the link will appear here.</p>
+    </div>
+
+    <h2>Contact</h2>
+    <p>Logic Trio is made by Nimbleknot, a one-person studio. Questions, bug reports and puzzle complaints are all welcome at <a href="mailto:nimbleknot.games@gmail.com">nimbleknot.games@gmail.com</a>.</p>
+  </main>
+
+  <footer>
+    <p><a href="privacy.html">Privacy policy</a> &middot; <a href="terms.html">Terms of use</a></p>
+    <p>Nimbleknot &mdash; <a href="mailto:nimbleknot.games@gmail.com">nimbleknot.games@gmail.com</a></p>
+  </footer>
+
+</div>
+</body>
+</html>
