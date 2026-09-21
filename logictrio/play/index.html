@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Play Logic Trio on Android — Nimbleknot</title>
+<meta name="description" content="How to play Logic Trio on your Android phone: three steps, about two minutes.">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Nimbleknot">
+<meta property="og:title" content="Play Logic Trio">
+<meta property="og:description" content="Three logic puzzles, a new page every day. How to play it on your Android phone: three steps, about two minutes.">
+<meta property="og:url" content="https://nimbleknot.github.io/logictrio/play/">
+<meta property="og:image" content="https://nimbleknot.github.io/logictrio/play/preview.png">
+<meta property="og:image:width" content="1024">
+<meta property="og:image:height" content="500">
+<meta name="twitter:card" content="summary_large_image">
+<!--
+  The one address every YouTube text, channel link and new recruiting post points to (D-069).
+  While Logic Trio is in Google Play's closed test it walks a stranger through the three steps;
+  on launch day it becomes a single "Open in Google Play" button, so no video, description or
+  post ever carries a dead link. No scripts, no analytics, no cookies, no redirect.
+-->
+<style>
+  :root {
+    color-scheme: light dark;
+    --paper: #FAF7F2;
+    --surface: #FFFFFF;
+    --ink: #1F2433;
+    --ink-muted: #5A5F6E;
+    --accent: #B86E00;
+    --accent-line: #F2A93B;
+    --rule: #E3DCD1;
+    --button: #1F2433;
+    --button-ink: #FFFFFF;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --paper: #12141C;
+      --surface: #1C1F2B;
+      --ink: #ECEEF5;
+      --ink-muted: #9AA0B4;
+      --accent: #FFBE5C;
+      --accent-line: #FFBE5C;
+      --rule: #2E3242;
+      --button: #FFBE5C;
+      --button-ink: #12141C;
+    }
+  }
+  * { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; }
+  body {
+    background: var(--paper);
+    color: var(--ink);
+    font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    font-size: 17px;
+    line-height: 1.6;
+    margin: 0;
+    padding: 0 16px 72px;
+    overflow-wrap: break-word;
+  }
+  .page { max-width: 34rem; margin: 0 auto; }
+  .masthead { padding-top: 32px; }
+  .wordmark {
+    font-family: Georgia, "Iowan Old Style", "Times New Roman", Times, serif;
+    font-size: 0.95rem; letter-spacing: 0.14em; text-transform: uppercase;
+    color: var(--ink-muted); margin: 0;
+  }
+  .wordmark a { color: inherit; text-decoration: none; }
+  h1, h2 { font-family: Georgia, "Iowan Old Style", "Times New Roman", Times, serif; font-weight: 600; line-height: 1.25; }
+  h1 { font-size: 2.1rem; margin: 18px 0 6px; letter-spacing: -0.01em; }
+  h2 { font-size: 1.25rem; margin: 44px 0 12px; padding-top: 24px; border-top: 1px solid var(--rule); }
+  .standfirst { color: var(--ink-muted); margin: 0 0 6px; }
+  .accent-rule { width: 56px; height: 3px; background: var(--accent-line); margin: 20px 0 24px; }
+  p { margin: 0 0 1em; }
+  .notice {
+    background: var(--surface); border: 1px solid var(--rule); border-left: 3px solid var(--accent-line);
+    padding: 14px 16px; margin: 0 0 14px;
+  }
+  .notice p:last-child { margin-bottom: 0; }
+  ol.steps { list-style: none; padding: 0; margin: 26px 0 0; counter-reset: step; }
+  ol.steps > li {
+    counter-increment: step; position: relative;
+    background: var(--surface); border: 1px solid var(--rule); border-radius: 14px;
+    padding: 18px 18px 16px 64px; margin: 0 0 14px;
+  }
+  ol.steps > li::before {
+    content: counter(step); position: absolute; left: 18px; top: 18px;
+    width: 32px; height: 32px; border-radius: 50%;
+    background: var(--accent-line); color: #1F2433;
+    font: 700 1.05rem/32px Georgia, "Times New Roman", serif; text-align: center;
+  }
+  .button {
+    display: block; text-align: center; text-decoration: none;
+    background: var(--button); color: var(--button-ink);
+    font-weight: 600; font-size: 1.08rem; line-height: 1.3;
+    padding: 15px 18px; border-radius: 12px; margin: 0 0 10px; min-height: 52px;
+  }
+  .button:hover { opacity: 0.92; color: var(--button-ink); }
+  .button:focus-visible { outline: 3px solid var(--accent); outline-offset: 3px; }
+  .note { color: var(--ink-muted); font-size: 0.96rem; margin: 0; }
+  a { color: var(--ink); text-decoration: underline; text-decoration-color: var(--accent-line); text-decoration-thickness: 2px; text-underline-offset: 3px; }
+  a:hover { color: var(--accent); }
+  .rules p { margin: 0 0 0.7em; }
+  footer { margin-top: 52px; padding-top: 24px; border-top: 1px solid var(--rule); color: var(--ink-muted); font-size: 0.95rem; }
+  footer p { margin: 0 0 0.5em; }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <header class="masthead">
+    <p class="wordmark"><a href="../">Nimbleknot &middot; Logic Trio</a></p>
+  </header>
+
+  <main>
+    <h1>Play Logic Trio</h1>
+    <p class="standfirst">Three logic puzzles, a new page every day.</p>
+    <div class="accent-rule"></div>
+
+    <p>Logic Trio is in Google Play&rsquo;s closed test before it goes public. Anyone with an Android phone (Android&nbsp;7 or newer) and a Google account can join and play it now. It takes about two minutes.</p>
+    <p class="note">iPhone: Logic Trio is Android only for now.</p>
+
+    <div class="notice" style="margin-top:22px">
+      <p><strong>Opened this inside LinkedIn, Discord, Instagram or another app?</strong> Tap &#8942; (or the share icon) and choose <strong>Open in Chrome</strong> or <strong>Open in browser</strong> first, so Google knows which account is yours.</p>
+    </div>
+    <div class="notice">
+      <p><strong>Use one Google account for all three steps:</strong> the one your Play Store uses (open the Play Store and tap your picture, top right). A personal Gmail works best; work and school accounts are often blocked from joining groups.</p>
+    </div>
+
+    <ol class="steps">
+      <li>
+        <a class="button" href="https://groups.google.com/g/logic-trio-testers">Join the testers&rsquo; group</a>
+        <p class="note">Tap <strong>Join group</strong> and confirm (email updates are optional). If Google asks you to sign in first, sign in with your Play Store account. Then come back here with <strong>Back</strong>, or use the <em>Become a tester</em> link in the group&rsquo;s &ldquo;Start here&rdquo; post.</p>
+      </li>
+      <li>
+        <a class="button" href="https://play.google.com/apps/testing/com.nimbleknot.logictrio">Become a tester</a>
+        <p class="note">Tap <strong>Become a tester</strong>. If it says the app isn&rsquo;t available, step&nbsp;1 was done with a different Google account from your Play Store: check the picture at the top right of both, then try again.</p>
+      </li>
+      <li>
+        <a class="button" href="https://play.google.com/store/apps/details?id=com.nimbleknot.logictrio">Install from Google Play</a>
+        <p class="note">If Play can&rsquo;t find it yet, wait ten minutes and tap this button again.</p>
+      </li>
+    </ol>
+
+    <h2>Why a test</h2>
+    <p>Google Play asks new developers for at least 12 testers who stay in the test for 14 days in a row before a game can go public. Please stay in for those 14 days, and play whenever you like. Every kind of feedback is welcome at <a href="mailto:nimbleknot.games@gmail.com">nimbleknot.games@gmail.com</a>.</p>
+
+    <h2>On a computer</h2>
+    <p>Steps 1 and 2 work in a computer&rsquo;s browser too. Then install from the Play Store on your Android phone, signed in to the same Google account.</p>
+
+    <h2>What it is</h2>
+    <div class="rules">
+      <p><strong>Crowns:</strong> one crown in every row, column and colour, and crowns never touch.</p>
+      <p><strong>Suns &amp; Moons:</strong> as many suns as moons in every row and column, never three alike in a row.</p>
+      <p><strong>Paths:</strong> one line through every cell, passing the numbers in order.</p>
+    </div>
+    <p>Every puzzle has exactly one solution. Solve one a day to keep your streak. No lives, and nothing counts down. Works offline. Free, with ads, and no ad ever interrupts a puzzle.</p>
+    <p><a href="../">More about Logic Trio</a></p>
+  </main>
+
+  <footer>
+    <p><a href="../privacy.html">Privacy policy</a> &middot; <a href="../terms.html">Terms of use</a> &middot; <a href="../delete-data.html">Delete your data</a></p>
+    <p>Nimbleknot &mdash; <a href="mailto:nimbleknot.games@gmail.com">nimbleknot.games@gmail.com</a></p>
+  </footer>
+
+</div>
+</body>
+</html>
