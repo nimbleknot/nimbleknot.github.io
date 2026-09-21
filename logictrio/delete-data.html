@@ -3,6 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Delete Your Data — Logic Trio</title>
 <meta name="description" content="How to delete your Logic Trio data: what is removed, what is kept, and how to ask.">
 <style>
   :root {
@@ -111,10 +112,10 @@
 
   <main>
     <h1>Delete your Logic Trio data</h1>
-    <p class="updated"><strong>Last updated: 21 September 2026</strong></p>
+    <p class="updated"><strong>Last updated: 22 September 2026</strong></p>
     <div class="accent-rule"></div>
 
-    <p><strong>Logic Trio</strong> is a puzzle game made by <strong>Nimbleknot</strong>. It has no account, no sign-in and no server, so there is no profile of you anywhere to close. Everything the game remembers is on your own phone, and you can erase all of it yourself in a few seconds.</p>
+    <p><strong>Logic Trio</strong> is a puzzle game made by <strong>Nimbleknot</strong>. It has no account, no sign-in and no server, so there is no profile of you anywhere to close. Your progress and settings are kept only on your own phone, and you can erase all of it yourself in a few seconds. The records the game sends to Google are covered further down.</p>
 
     <h2>How to delete everything, in the game</h2>
 
@@ -143,24 +144,30 @@
 
     <h2>What is kept, and by whom</h2>
 
-    <p>Nimbleknot keeps <strong>nothing</strong>. There is no server and no database, so there is no copy of your progress anywhere but your phone, and nothing is retained after you delete it — there is no retention period because there is nothing retained.</p>
+    <p>Your progress is gone for good. There is no server and no database, so there is no copy of it anywhere but your phone.</p>
 
-    <p>Two things are not Nimbleknot's to delete, and it is only fair to say so plainly:</p>
+    <p>Three things are not erased by that button, and it is only fair to say so plainly:</p>
 
     <h3>1. Your own Google Drive backup</h3>
     <p>If Android's automatic backup is switched on, your phone may have copied the game's save file to <strong>your own Google Drive</strong>, the same way it backs up your other apps. That copy is in your Google account, not ours, and we cannot reach it. You can remove it in your phone's settings, under Google → Backup, or by turning backup off for Logic Trio.</p>
 
-    <h3>2. What Google's advertising and analytics services hold</h3>
-    <p>The game shows adverts and reports crashes through Google's own services. They receive technical information — an advertising identifier, an approximate area from your IP address, and records of what happened in the game. <strong>None of it identifies you by name</strong>, and Nimbleknot never receives it: it goes to Google. See the <a href="privacy.html">Privacy Policy</a> for exactly what.</p>
-    <p>You control that side directly on your phone:</p>
+    <h3>2. Analytics records and crash reports</h3>
+    <p>While you play, the game sends <strong>Google Analytics</strong> records of what happened in it — which puzzle was opened, how long it took, whether a hint was used — and, if it crashes, a crash report to <strong>Firebase Crashlytics</strong>. Both go into the developer's own Google Analytics and Firebase accounts, where the developer can read them. They are filed under random IDs, <strong>never under a name or an email address</strong>. Google Analytics deletes each record after <strong>14 months</strong>; crash reports are kept for <strong>90 days</strong> and then deleted. The Delete my data button does not reach them.</p>
+
+    <h3>3. What Google's advertising holds</h3>
+    <p>The adverts come from Google AdMob, which receives an advertising identifier, an approximate area from your IP address and records of the ads shown, and keeps them under <a href="https://policies.google.com/technologies/retention">Google's own retention rules</a>. That data goes to Google, not to the developer. See the <a href="privacy.html">Privacy Policy</a> for exactly what is collected and how long each part is kept.</p>
+    <p>You control these directly on your phone:</p>
     <ul>
       <li><strong>Reset or delete your advertising ID:</strong> Android → Settings → Privacy → Ads. Deleting it stops adverts being personalised to your device.</li>
-      <li>If you live in the European Economic Area, the UK or Switzerland, the game shows you Google's consent form and you can change your answer at any time in <strong>Me → Settings → Your data → Privacy choices</strong>.</li>
+      <li>If you live in the European Economic Area, the UK or Switzerland, the game shows you Google's consent form and you can change your answer at any time in <strong>Me → Settings → Your data → Privacy choices</strong>. Refusing there also switches off the Analytics records above and throws away those still waiting on the phone to be sent.</li>
+      <li><strong>Uninstalling the game</strong> stops every record, everywhere. What was already sent is deleted on the schedule above. The one ID that outlives the game is your phone's advertising ID, which the ads and Analytics also received. Reset or delete it (first point above) and nothing on your phone links to those records any more.</li>
     </ul>
 
     <h2>If you would rather ask</h2>
 
-    <p>Write to <a href="mailto:nimbleknot.games@gmail.com">nimbleknot.games@gmail.com</a> and say what you would like removed. Bear in mind what is above: because Nimbleknot holds no database and receives nothing that identifies you, there is usually nothing held about you for us to find or erase — the deletion is genuinely in your hands, on your phone. Questions are welcome all the same and will be answered.</p>
+    <p>Write to <a href="mailto:nimbleknot.games@gmail.com">nimbleknot.games@gmail.com</a> and say what you would like removed. Here is what the developer can and cannot do, said honestly.</p>
+
+    <p>Google Analytics can delete one phone's records, but only when it is given the random app-instance ID they are filed under, and Logic Trio does not show that ID anywhere. An email carries nothing that points to your records, so they cannot be picked out from other players', and we will not claim to have deleted something we could not find. What does work is in the list above: refuse measurement in Privacy choices where it is offered, or uninstall, and nothing new is recorded; what is already there is deleted automatically after 14 months, crash reports after 90 days. Your progress itself is entirely in your hands, on your phone. Questions are welcome all the same and will be answered.</p>
 
     <p class="backlink"><a href="index.html">Back to Logic Trio</a> &middot; <a href="privacy.html">Privacy policy</a> &middot; <a href="terms.html">Terms of use</a></p>
   </main>
