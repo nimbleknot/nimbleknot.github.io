@@ -112,7 +112,7 @@
 
   <main>
     <h1>Delete your Logic Trio data</h1>
-    <p class="updated"><strong>Last updated: 22 September 2026</strong></p>
+    <p class="updated"><strong>Last updated: 3 October 2026</strong></p>
     <div class="accent-rule"></div>
 
     <p><strong>Logic Trio</strong> is a puzzle game made by <strong>Nimbleknot</strong>. It has no account, no sign-in and no server, so there is no profile of you anywhere to close. Your progress and settings are kept only on your own phone, and you can erase all of it yourself in a few seconds. The records the game sends to Google are covered further down.</p>
@@ -152,7 +152,7 @@
     <p>If Android's automatic backup is switched on, your phone may have copied the game's save file to <strong>your own Google Drive</strong>, the same way it backs up your other apps. That copy is in your Google account, not ours, and we cannot reach it. You can remove it in your phone's settings, under Google → Backup, or by turning backup off for Logic Trio.</p>
 
     <h3>2. Analytics records and crash reports</h3>
-    <p>While you play, the game sends <strong>Google Analytics</strong> records of what happened in it — which puzzle was opened, how long it took, whether a hint was used — and, if it crashes, a crash report to <strong>Firebase Crashlytics</strong>. Both go into the developer's own Google Analytics and Firebase accounts, where the developer can read them. They are filed under random IDs, <strong>never under a name or an email address</strong>. Google Analytics deletes each record after <strong>14 months</strong>; crash reports are kept for <strong>90 days</strong> and then deleted. The Delete my data button does not reach them.</p>
+    <p>While you play, the game sends <strong>Google Analytics</strong> records of what happened in it — which puzzle was opened, how long it took, whether a hint was used — and, if it crashes, a crash report to <strong>Firebase Crashlytics</strong>. Both go into the developer's own Google Analytics and Firebase accounts, where the developer can read them. They are filed under random IDs, <strong>never under a name or an email address</strong>. Google Analytics deletes each record after <strong>14 months</strong>; crash reports are kept for <strong>90 days</strong> and then deleted. The Delete my data button cannot reach records that were already sent. Since version 1.0.2 it clears the ones still waiting on the phone and gives the game a new random app-instance ID, so records sent afterwards are not joined to the earlier ones. It does not change the IDs used for crash reports, and it does not switch the records off: where you were asked, only refusing in Privacy choices does that.</p>
 
     <h3>3. What Google's advertising holds</h3>
     <p>The adverts come from Google AdMob, which receives an advertising identifier, an approximate area from your IP address and records of the ads shown, and keeps them under <a href="https://policies.google.com/technologies/retention">Google's own retention rules</a>. That data goes to Google, not to the developer. See the <a href="privacy.html">Privacy Policy</a> for exactly what is collected and how long each part is kept.</p>
@@ -160,6 +160,7 @@
     <ul>
       <li><strong>Reset or delete your advertising ID:</strong> Android → Settings → Privacy → Ads. Deleting it stops adverts being personalised to your device.</li>
       <li>If you live in the European Economic Area, the UK or Switzerland, the game shows you Google's consent form and you can change your answer at any time in <strong>Me → Settings → Your data → Privacy choices</strong>. Refusing there also switches off the Analytics records above and throws away those still waiting on the phone to be sent.</li>
+      <li>If you are in California or one of the other US states listed in the <a href="privacy.html#us">privacy policy</a>, <strong>Me → Settings → Your data → Do Not Sell or Share My Personal Information</strong> opts you out of the sale and sharing of your information for ads. Delete my data does not undo that choice.</li>
       <li><strong>Uninstalling the game</strong> stops every record, everywhere. What was already sent is deleted on the schedule above. The one ID that outlives the game is your phone's advertising ID, which the ads and Analytics also received. Reset or delete it (first point above) and nothing on your phone links to those records any more.</li>
     </ul>
 
