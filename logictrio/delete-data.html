@@ -112,10 +112,10 @@
 
   <main>
     <h1>Delete your Logic Trio data</h1>
-    <p class="updated"><strong>Last updated: 3 October 2026</strong></p>
+    <p class="updated"><strong>Last updated: 14 October 2026</strong></p>
     <div class="accent-rule"></div>
 
-    <p><strong>Logic Trio</strong> is a puzzle game made by <strong>Nimbleknot</strong>. It has no account, no sign-in and no server, so there is no profile of you anywhere to close. Your progress and settings are kept only on your own phone, and you can erase all of it yourself in a few seconds. The records the game sends to Google are covered further down.</p>
+    <p><strong>Logic Trio</strong> is a puzzle game made by <strong>Nimbleknot</strong>. It has no account of its own and no server, so there is no Logic Trio profile of you anywhere to close. Signing in to Google Play Games is optional (since version 1.0.5). Your progress and settings are kept on your own phone, with a copy of your progress in your Google account if you sign in to Play Games, and you can erase them yourself in a few seconds. The records the game sends to Google are covered further down.</p>
 
     <h2>How to delete everything, in the game</h2>
 
@@ -126,7 +126,9 @@
 
     <p>You do not need to ask anyone, wait for anything, or be online. The deletion happens on the phone, immediately, and it cannot be undone.</p>
 
-    <p><strong>Uninstalling the game does the same thing.</strong> Android removes the whole of it with the app.</p>
+    <p>If you are signed in to Google Play Games, the same button also deletes the copy of your progress in your Google account. That part needs the internet: if the phone is offline, the game deletes the copy at a later start, once it can.</p>
+
+    <p><strong>Uninstalling the game does the same thing on the phone.</strong> Android removes the whole of it with the app. Uninstalling does not delete a Play Games copy in your Google account, so use Delete my data first, while you are signed in.</p>
 
     <h2>What that deletes</h2>
 
@@ -140,21 +142,25 @@
       <li>your scheduled daily reminders, which are cancelled on the phone</li>
       <li>the small diagnostic log the game keeps on the phone</li>
       <li>any half-finished board</li>
+      <li>the copy of your progress in your Google account, if you are signed in to Google Play Games on this phone (as soon as the phone is online)</li>
     </ul>
 
     <h2>What is kept, and by whom</h2>
 
-    <p>Your progress is gone for good. There is no server and no database, so there is no copy of it anywhere but your phone.</p>
+    <p>Your progress is gone for good from this phone and, if you were signed in to Google Play Games, from your Google account. Nimbleknot has no server and no database, so it holds no copy of its own anywhere.</p>
 
-    <p>Three things are not erased by that button, and it is only fair to say so plainly:</p>
+    <p>Four things are not erased by that button, and it is only fair to say so plainly:</p>
 
     <h3>1. Your own Google Drive backup</h3>
     <p>If Android's automatic backup is switched on, your phone may have copied the game's save file to <strong>your own Google Drive</strong>, the same way it backs up your other apps. That copy is in your Google account, not ours, and we cannot reach it. You can remove it in your phone's settings, under Google → Backup, or by turning backup off for Logic Trio.</p>
 
-    <h3>2. Analytics records and crash reports</h3>
+    <h3>2. Your Play Games profile, and your other phones</h3>
+    <p>If you use <strong>Google Play Games</strong>, your Play Games profile, with your gamer name and player ID, is Google's, not ours, and Delete my data does not remove it. Nor does it reach the analytics and diagnostics that Google's Play Games library sends Google for its own use, which Google keeps under its own rules. Another phone signed in to the same Google account keeps its own progress, and the next time it is used it puts a copy back in your Google account. To remove your progress everywhere, use Delete my data on each of your phones. To delete your whole Play Games profile, with what Google keeps for it, use your Play Games profile settings or your Google Account; Google explains how in <a href="https://support.google.com/googleplay/answer/9130646">Delete your Play Games data or Play Games profile</a>.</p>
+
+    <h3>3. Analytics records and crash reports</h3>
     <p>While you play, the game sends <strong>Google Analytics</strong> records of what happened in it — which puzzle was opened, how long it took, whether a hint was used — and, if it crashes, a crash report to <strong>Firebase Crashlytics</strong>. Both go into the developer's own Google Analytics and Firebase accounts, where the developer can read them. They are filed under random IDs, <strong>never under a name or an email address</strong>. Google Analytics deletes each record after <strong>14 months</strong>; crash reports are kept for <strong>90 days</strong> and then deleted. The Delete my data button cannot reach records that were already sent. Since version 1.0.2 it clears the ones still waiting on the phone and gives the game a new random app-instance ID, so records sent afterwards are not joined to the earlier ones. It does not change the IDs used for crash reports, and it does not switch the records off: where you were asked, only refusing in Privacy choices does that.</p>
 
-    <h3>3. What Google's advertising holds</h3>
+    <h3>4. What Google's advertising holds</h3>
     <p>The adverts come from Google AdMob, which receives an advertising identifier, an approximate area from your IP address and records of the ads shown, and keeps them under <a href="https://policies.google.com/technologies/retention">Google's own retention rules</a>. That data goes to Google, not to the developer. See the <a href="privacy.html">Privacy Policy</a> for exactly what is collected and how long each part is kept.</p>
     <p>You control these directly on your phone:</p>
     <ul>
@@ -168,7 +174,7 @@
 
     <p>Write to <a href="mailto:nimbleknot.games@gmail.com">nimbleknot.games@gmail.com</a> and say what you would like removed. Here is what the developer can and cannot do, said honestly.</p>
 
-    <p>Google Analytics can delete one phone's records, but only when it is given the random app-instance ID they are filed under, and Logic Trio does not show that ID anywhere. An email carries nothing that points to your records, so they cannot be picked out from other players', and we will not claim to have deleted something we could not find. What does work is in the list above: refuse measurement in Privacy choices where it is offered, or uninstall, and nothing new is recorded; what is already there is deleted automatically after 14 months, crash reports after 90 days. Your progress itself is entirely in your hands, on your phone. Questions are welcome all the same and will be answered.</p>
+    <p>Google Analytics can delete one phone's records, but only when it is given the random app-instance ID they are filed under, and Logic Trio does not show that ID anywhere. An email carries nothing that points to your records, so they cannot be picked out from other players', and we will not claim to have deleted something we could not find. What does work is in the list above: refuse measurement in Privacy choices where it is offered, or uninstall, and nothing new is recorded; what is already there is deleted automatically after 14 months, crash reports after 90 days. Your progress itself is entirely in your hands, on your phone and, if you use Play Games, in your Google account. Questions are welcome all the same and will be answered.</p>
 
     <p class="backlink"><a href="index.html">Back to Logic Trio</a> &middot; <a href="privacy.html">Privacy policy</a> &middot; <a href="terms.html">Terms of use</a></p>
   </main>
