@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>スターバトルの遊び方（クラウン） | Logic Trio</title>
+<meta name="description" content="Logic Trioでは「クラウン」と呼ぶスターバトルの遊び方：短い手順のルール、解答例、初心者向けのコツ。">
+<link rel="canonical" href="https://nimbleknot.github.io/logictrio/how-to-play/ja/crowns.html">
+<link rel="alternate" hreflang="en" href="https://nimbleknot.github.io/logictrio/how-to-play/crowns.html">
+<link rel="alternate" hreflang="hi" href="https://nimbleknot.github.io/logictrio/how-to-play/hi/crowns.html">
+<link rel="alternate" hreflang="pt-BR" href="https://nimbleknot.github.io/logictrio/how-to-play/pt/crowns.html">
+<link rel="alternate" hreflang="es-419" href="https://nimbleknot.github.io/logictrio/how-to-play/es/crowns.html">
+<link rel="alternate" hreflang="id" href="https://nimbleknot.github.io/logictrio/how-to-play/id/crowns.html">
+<link rel="alternate" hreflang="de" href="https://nimbleknot.github.io/logictrio/how-to-play/de/crowns.html">
+<link rel="alternate" hreflang="fr" href="https://nimbleknot.github.io/logictrio/how-to-play/fr/crowns.html">
+<link rel="alternate" hreflang="it" href="https://nimbleknot.github.io/logictrio/how-to-play/it/crowns.html">
+<link rel="alternate" hreflang="tr" href="https://nimbleknot.github.io/logictrio/how-to-play/tr/crowns.html">
+<link rel="alternate" hreflang="ru" href="https://nimbleknot.github.io/logictrio/how-to-play/ru/crowns.html">
+<link rel="alternate" hreflang="pl" href="https://nimbleknot.github.io/logictrio/how-to-play/pl/crowns.html">
+<link rel="alternate" hreflang="ja" href="https://nimbleknot.github.io/logictrio/how-to-play/ja/crowns.html">
+<link rel="alternate" hreflang="ko" href="https://nimbleknot.github.io/logictrio/how-to-play/ko/crowns.html">
+<link rel="alternate" hreflang="x-default" href="https://nimbleknot.github.io/logictrio/how-to-play/crowns.html">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="Nimbleknot">
+<meta property="og:title" content="スターバトルの遊び方（クラウン） | Logic Trio">
+<meta property="og:description" content="Logic Trioでは「クラウン」と呼ぶスターバトルの遊び方：短い手順のルール、解答例、初心者向けのコツ。">
+<meta property="og:url" content="https://nimbleknot.github.io/logictrio/how-to-play/ja/crowns.html">
+<meta property="og:image" content="https://nimbleknot.github.io/logictrio/share.png">
+<meta property="og:image:width" content="1024">
+<meta property="og:image:height" content="500">
+<meta name="twitter:card" content="summary_large_image">
+<!-- How-to page. No scripts, no analytics, no cookies. -->
+<style>
+  :root {
+    color-scheme: light dark;
+    --paper: #FAF7F2; --surface: #FFFFFF; --ink: #1F2433; --ink-muted: #5A5F6E;
+    --accent: #B86E00; --accent-line: #F2A93B; --rule: #E3DCD1;
+    --button: #1F2433; --button-ink: #FFFFFF;
+    --hair: rgba(31, 36, 51, 0.16); --given: #F0EBE1; --primary: #2F3A8F;
+    --sun: #F2A93B; --sun-line: #B86E00; --crown: #1F2433; --error: #C73A34; --success: #14806F;
+    --g0: #6AA4CF; --g1: #FEE888; --g2: #E9BFC1; --g3: #A99D3B; --g4: #D3EDBA; --g5: #95B09A; --g6: #B1BEFC; --g7: #8ECAD4; --g8: #FF9577; --g9: #C68BA8;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --paper: #12141C; --surface: #1C1F2B; --ink: #ECEEF5; --ink-muted: #9AA0B4;
+      --accent: #FFBE5C; --accent-line: #FFBE5C; --rule: #2E3242;
+      --button: #FFBE5C; --button-ink: #12141C;
+      --hair: rgba(236, 238, 245, 0.2); --given: #2A2E3D; --primary: #8E9BFF;
+      --sun: #FFBE5C; --sun-line: #E09A2E; --crown: #FFFFFF; --error: #FF6B62; --success: #4FD1B8;
+      --g0: #46387E; --g1: #7D7219; --g2: #AD5E76; --g3: #304429; --g4: #4D4949; --g5: #62699F; --g6: #895A44; --g7: #357365; --g8: #095663; --g9: #644005;
+    }
+  }
+  * { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; }
+  body {
+    background: var(--paper); color: var(--ink);
+    font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    font-size: 17px; line-height: 1.6; margin: 0; padding: 0 16px 72px; overflow-wrap: break-word;
+  }
+  .page { max-width: 36rem; margin: 0 auto; }
+  .masthead { padding-top: 32px; }
+  .wordmark {
+    font-family: Georgia, "Iowan Old Style", "Times New Roman", Times, serif;
+    font-size: 0.95rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink-muted); margin: 0;
+  }
+  .wordmark a { color: inherit; text-decoration: none; }
+  .langs { margin: 10px 0 0; font-size: 0.86rem; color: var(--ink-muted); line-height: 1.9; }
+  .langs a, .langs span { margin-right: 0.7em; white-space: nowrap; }
+  .langs a { color: var(--ink-muted); text-decoration-thickness: 1px; }
+  .langs span { color: var(--ink); font-weight: 600; }
+  h1, h2, h3 { font-family: Georgia, "Iowan Old Style", "Times New Roman", Times, serif; font-weight: 600; line-height: 1.25; }
+  h1 { font-size: 2rem; margin: 18px 0 6px; letter-spacing: -0.01em; }
+  h2 { font-size: 1.25rem; margin: 40px 0 12px; padding-top: 22px; border-top: 1px solid var(--rule); }
+  h3 { font-size: 1.1rem; margin: 26px 0 2px; }
+  .standfirst { color: var(--ink-muted); margin: 0 0 6px; }
+  .accent-rule { width: 56px; height: 3px; background: var(--accent-line); margin: 20px 0 24px; }
+  p { margin: 0 0 1em; }
+  ol, ul { margin: 0 0 1em; padding-left: 1.4em; }
+  li { margin-bottom: 0.5em; }
+  .kind { color: var(--ink-muted); margin: 0 0 0.3em; font-size: 0.96rem; }
+  figure { margin: 0 0 1em; }
+  figcaption { color: var(--ink-muted); font-size: 0.95rem; margin-top: 8px; }
+  svg.ex { display: block; width: 100%; max-width: 300px; height: auto; }
+  .ex .thin { stroke: var(--hair); stroke-width: 1; }
+  .ex .thick { stroke: var(--ink); stroke-width: 3; stroke-linecap: round; }
+  .ex .frame { fill: none; stroke: var(--ink); stroke-width: 3; }
+  .ex .crown { fill: var(--crown); stroke: var(--crown); stroke-width: 1.8; stroke-linejoin: round; }
+  .ex .open { fill: var(--surface); }
+  .ex .given { fill: var(--given); }
+  .ex .sun { fill: var(--sun); stroke: var(--sun-line); stroke-width: 1.4; }
+  .ex .ray { stroke: var(--sun-line); stroke-width: 1.8; stroke-linecap: round; }
+  .ex .moon { fill: var(--primary); }
+  .ex .badge { fill: var(--surface); stroke: var(--ink); stroke-width: 1.5; }
+  .ex .badge-t { fill: var(--ink); font: 600 10px system-ui, sans-serif; text-anchor: middle; dominant-baseline: central; }
+  .ex .line { fill: none; stroke: var(--primary); stroke-width: 12; stroke-linecap: round; stroke-linejoin: round; opacity: 0.85; }
+  .ex .wall { stroke: var(--ink); stroke-width: 5; stroke-linecap: round; }
+  .ex .dot { fill: var(--ink); }
+  .ex .num { fill: var(--paper); font: 700 12px system-ui, sans-serif; text-anchor: middle; dominant-baseline: central; }
+  .ex .g0 { fill: var(--g0); } .ex .g1 { fill: var(--g1); } .ex .g2 { fill: var(--g2); } .ex .g3 { fill: var(--g3); } .ex .g4 { fill: var(--g4); } .ex .g5 { fill: var(--g5); } .ex .g6 { fill: var(--g6); } .ex .g7 { fill: var(--g7); } .ex .g8 { fill: var(--g8); } .ex .g9 { fill: var(--g9); }
+  .cta { margin: 30px 0 12px; }
+  .button {
+    display: block; text-align: center; text-decoration: none;
+    background: var(--button); color: var(--button-ink);
+    font-weight: 600; font-size: 1.08rem; line-height: 1.3;
+    padding: 15px 18px; border-radius: 12px; margin: 0 0 10px; min-height: 52px;
+  }
+  .button:hover { opacity: 0.92; color: var(--button-ink); }
+  .button:focus-visible { outline: 3px solid var(--accent); outline-offset: 3px; }
+  .app { display: flex; gap: 12px; align-items: center; margin: 0 0 1em; }
+  .app img { width: 48px; height: 48px; border-radius: 11px; flex: none; }
+  .note { color: var(--ink-muted); font-size: 0.95rem; margin: 0; }
+  a { color: var(--ink); text-decoration: underline; text-decoration-color: var(--accent-line); text-decoration-thickness: 2px; text-underline-offset: 3px; }
+  a:hover { color: var(--accent); }
+  a:focus-visible { outline: 3px solid var(--accent); outline-offset: 3px; }
+  footer { margin-top: 52px; padding-top: 24px; border-top: 1px solid var(--rule); color: var(--ink-muted); font-size: 0.95rem; }
+  footer p { margin: 0 0 0.5em; }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <header class="masthead">
+    <p class="wordmark"><a href="../../">Nimbleknot &middot; Logic Trio</a></p>
+    <nav class="langs" aria-label="言語"><a href="../crowns.html" hreflang="en" lang="en">English</a> <a href="../hi/crowns.html" hreflang="hi" lang="hi">हिन्दी</a> <a href="../pt/crowns.html" hreflang="pt-BR" lang="pt-BR">Português</a> <a href="../es/crowns.html" hreflang="es-419" lang="es-419">Español</a> <a href="../id/crowns.html" hreflang="id" lang="id">Indonesia</a> <a href="../de/crowns.html" hreflang="de" lang="de">Deutsch</a> <a href="../fr/crowns.html" hreflang="fr" lang="fr">Français</a> <a href="../it/crowns.html" hreflang="it" lang="it">Italiano</a> <a href="../tr/crowns.html" hreflang="tr" lang="tr">Türkçe</a> <a href="../ru/crowns.html" hreflang="ru" lang="ru">Русский</a> <a href="../pl/crowns.html" hreflang="pl" lang="pl">Polski</a> <span aria-current="page" lang="ja">日本語</span> <a href="../ko/crowns.html" hreflang="ko" lang="ko">한국어</a></nav>
+  </header>
+
+  <main>
+    <h1>スターバトルの遊び方（クラウン）</h1>
+    <p class="standfirst">行・列・色ごとにクラウンを1つ</p>
+    <div class="accent-rule"></div>
+    <p>クラウンはスターバトルと呼ばれるパズルです。盤面はいくつかの色に分かれていて、そこにクラウンを置いていきます。</p>
+
+    <h2>ルール</h2>
+    <ol>
+      <li>どの行・列・色にもクラウンが1つ。</li>
+      <li>クラウン同士は斜めでも隣り合いません。</li>
+      <li>1回タップで×（なし）、2回でクラウン。ドラッグで×を塗れます。</li>
+      <li>どのパズルも答えはひとつだけで、当てずっぽうは必要ありません。</li>
+    </ol>
+
+    <h2>解答例</h2>
+    <figure>
+      <svg class="ex" viewBox="0 0 204 204" width="244" height="244" role="img" aria-labelledby="ex-t" xmlns="http://www.w3.org/2000/svg"><title id="ex-t">ゲームのかんたんな5×5のクラウンの解答：5色に5個のクラウン。</title><rect class="g6" x="2" y="2" width="40" height="40"/><rect class="g1" x="42" y="2" width="40" height="40"/><rect class="g1" x="82" y="2" width="40" height="40"/><rect class="g1" x="122" y="2" width="40" height="40"/><rect class="g1" x="162" y="2" width="40" height="40"/><rect class="g6" x="2" y="42" width="40" height="40"/><rect class="g6" x="42" y="42" width="40" height="40"/><rect class="g1" x="82" y="42" width="40" height="40"/><rect class="g8" x="122" y="42" width="40" height="40"/><rect class="g1" x="162" y="42" width="40" height="40"/><rect class="g4" x="2" y="82" width="40" height="40"/><rect class="g8" x="42" y="82" width="40" height="40"/><rect class="g8" x="82" y="82" width="40" height="40"/><rect class="g8" x="122" y="82" width="40" height="40"/><rect class="g1" x="162" y="82" width="40" height="40"/><rect class="g4" x="2" y="122" width="40" height="40"/><rect class="g0" x="42" y="122" width="40" height="40"/><rect class="g8" x="82" y="122" width="40" height="40"/><rect class="g0" x="122" y="122" width="40" height="40"/><rect class="g0" x="162" y="122" width="40" height="40"/><rect class="g0" x="2" y="162" width="40" height="40"/><rect class="g0" x="42" y="162" width="40" height="40"/><rect class="g0" x="82" y="162" width="40" height="40"/><rect class="g0" x="122" y="162" width="40" height="40"/><rect class="g0" x="162" y="162" width="40" height="40"/><line class="thin" x1="42" y1="2" x2="42" y2="202"/><line class="thin" x1="2" y1="42" x2="202" y2="42"/><line class="thin" x1="82" y1="2" x2="82" y2="202"/><line class="thin" x1="2" y1="82" x2="202" y2="82"/><line class="thin" x1="122" y1="2" x2="122" y2="202"/><line class="thin" x1="2" y1="122" x2="202" y2="122"/><line class="thin" x1="162" y1="2" x2="162" y2="202"/><line class="thin" x1="2" y1="162" x2="202" y2="162"/><line class="thick" x1="42" y1="2" x2="42" y2="42"/><line class="thick" x1="42" y1="42" x2="82" y2="42"/><line class="thick" x1="122" y1="42" x2="162" y2="42"/><line class="thick" x1="2" y1="82" x2="42" y2="82"/><line class="thick" x1="82" y1="42" x2="82" y2="82"/><line class="thick" x1="42" y1="82" x2="82" y2="82"/><line class="thick" x1="122" y1="42" x2="122" y2="82"/><line class="thick" x1="82" y1="82" x2="122" y2="82"/><line class="thick" x1="162" y1="42" x2="162" y2="82"/><line class="thick" x1="42" y1="82" x2="42" y2="122"/><line class="thick" x1="42" y1="122" x2="82" y2="122"/><line class="thick" x1="162" y1="82" x2="162" y2="122"/><line class="thick" x1="122" y1="122" x2="162" y2="122"/><line class="thick" x1="162" y1="122" x2="202" y2="122"/><line class="thick" x1="42" y1="122" x2="42" y2="162"/><line class="thick" x1="2" y1="162" x2="42" y2="162"/><line class="thick" x1="82" y1="122" x2="82" y2="162"/><line class="thick" x1="122" y1="122" x2="122" y2="162"/><line class="thick" x1="82" y1="162" x2="122" y2="162"/><rect class="frame" x="2" y="2" width="200" height="200"/><path class="crown" d="M172.9 29.9 L170.4 17.1 L177.1 22.6 L182.0 13.5 L186.9 22.6 L193.6 17.1 L191.1 29.9 Z"/><path class="crown" d="M52.9 69.9 L50.4 57.1 L57.1 62.6 L62.0 53.5 L66.9 62.6 L73.6 57.1 L71.1 69.9 Z"/><path class="crown" d="M132.9 109.9 L130.4 97.1 L137.1 102.6 L142.0 93.5 L146.9 102.6 L153.6 97.1 L151.1 109.9 Z"/><path class="crown" d="M12.9 149.9 L10.4 137.1 L17.1 142.6 L22.0 133.5 L26.9 142.6 L33.6 137.1 L31.1 149.9 Z"/><path class="crown" d="M92.9 189.9 L90.4 177.1 L97.1 182.6 L102.0 173.5 L106.9 182.6 L113.6 177.1 L111.1 189.9 Z"/></svg>
+      <figcaption>ゲームのかんたんな5×5のクラウンの解答：5色に5個のクラウン。</figcaption>
+    </figure>
+
+    <h2>初心者向けのコツ</h2>
+    <ul>
+      <li>1つの行の中にすべて収まっている色には、その行のクラウンが入ります。その行の残りのマスには×を付けましょう。列でも同じです。</li>
+      <li>クラウンを置くと、その行、列、色と、周りの8マスには置けなくなります。ゲームが薄い×で自動的に印を付けてくれます。</li>
+      <li>2つの色が同じ2行の中に収まっているなら、その2行のクラウンはその2色に入ります。その2行のほかのマスはすべて×です。</li>
+    </ul>
+
+    <div class="cta">
+      <a class="button" href="https://play.google.com/store/apps/details?id=com.nimbleknot.logictrio&amp;referrer=utm_source%3Dwebsite%26utm_medium%3Dhowto%26utm_campaign%3Dcrowns_ja">Google Playで無料で遊ぶ</a>
+    </div>
+    <div class="app">
+      <img src="../../icon-512.png" width="48" height="48" alt="" loading="lazy">
+      <p class="note">Android 7以降に対応。無料（広告あり）で、パズルの途中に広告は入りません。</p>
+    </div>
+    <p><a href="../../daily/" hreflang="en">今日のクラウンをブラウザで遊ぶ（英語）</a></p>
+
+    <h2>ほかの2つのパズル</h2>
+    <ul>
+      <li><a href="suns-and-moons.html">太陽と月の遊び方</a> (バイナリーパズル)</li>
+      <li><a href="paths.html">パスの遊び方</a> (一筆書き)</li>
+    </ul>
+    <p><a href="./">3つのパズル</a></p>
+  </main>
+
+  <footer>
+    <p><a href="../../privacy.html">Privacy policy</a> &middot; <a href="../../terms.html">Terms of use</a> &middot; <a href="../../delete-data.html">Delete your data</a></p>
+    <p>Nimbleknot &middot; <a href="mailto:nimbleknot.games@gmail.com">nimbleknot.games@gmail.com</a></p>
+  </footer>
+
+</div>
+</body>
+</html>

@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Today's Crowns: a free daily star battle puzzle | Logic Trio</title>
+<meta name="description" content="Play today's Crowns, the daily star battle puzzle of Logic Trio, in your browser: the same board every player gets in the app today. One crown in every row, column and colour.">
+<link rel="canonical" href="https://nimbleknot.github.io/logictrio/daily/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Nimbleknot">
+<meta property="og:title" content="Today's Crowns">
+<meta property="og:description" content="The daily star battle puzzle of Logic Trio, playable in your browser.">
+<meta property="og:url" content="https://nimbleknot.github.io/logictrio/daily/">
+<meta property="og:image" content="https://nimbleknot.github.io/logictrio/share.png">
+<meta property="og:image:width" content="1024">
+<meta property="og:image:height" content="500">
+<meta name="twitter:card" content="summary_large_image">
+<!--
+  Today's Crowns from the app's daily pack (daily_LT1, 2026-09-17 to 2027-03-15), picked by the visitor's own date.
+  One inline script, nothing loaded from elsewhere. No analytics, no cookies. Progress for today only,
+  in this browser's local storage when it allows it.
+-->
+<style>
+  :root {
+    color-scheme: light dark;
+    --paper: #FAF7F2; --surface: #FFFFFF; --ink: #1F2433; --ink-muted: #5A5F6E;
+    --accent: #B86E00; --accent-line: #F2A93B; --rule: #E3DCD1;
+    --button: #1F2433; --button-ink: #FFFFFF;
+    --hair: rgba(31, 36, 51, 0.16); --given: #F0EBE1; --primary: #2F3A8F;
+    --sun: #F2A93B; --sun-line: #B86E00; --crown: #1F2433; --error: #C73A34; --success: #14806F;
+    --g0: #6AA4CF; --g1: #FEE888; --g2: #E9BFC1; --g3: #A99D3B; --g4: #D3EDBA; --g5: #95B09A; --g6: #B1BEFC; --g7: #8ECAD4; --g8: #FF9577; --g9: #C68BA8;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --paper: #12141C; --surface: #1C1F2B; --ink: #ECEEF5; --ink-muted: #9AA0B4;
+      --accent: #FFBE5C; --accent-line: #FFBE5C; --rule: #2E3242;
+      --button: #FFBE5C; --button-ink: #12141C;
+      --hair: rgba(236, 238, 245, 0.2); --given: #2A2E3D; --primary: #8E9BFF;
+      --sun: #FFBE5C; --sun-line: #E09A2E; --crown: #FFFFFF; --error: #FF6B62; --success: #4FD1B8;
+      --g0: #46387E; --g1: #7D7219; --g2: #AD5E76; --g3: #304429; --g4: #4D4949; --g5: #62699F; --g6: #895A44; --g7: #357365; --g8: #095663; --g9: #644005;
+    }
+  }
+  * { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; }
+  body {
+    background: var(--paper); color: var(--ink);
+    font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    font-size: 17px; line-height: 1.6; margin: 0; padding: 0 16px 72px; overflow-wrap: break-word;
+  }
+  .page { max-width: 36rem; margin: 0 auto; }
+  .masthead { padding-top: 32px; }
+  .wordmark {
+    font-family: Georgia, "Iowan Old Style", "Times New Roman", Times, serif;
+    font-size: 0.95rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink-muted); margin: 0;
+  }
+  .wordmark a { color: inherit; text-decoration: none; }
+  .langs { margin: 10px 0 0; font-size: 0.86rem; color: var(--ink-muted); line-height: 1.9; }
+  .langs a, .langs span { margin-right: 0.7em; white-space: nowrap; }
+  .langs a { color: var(--ink-muted); text-decoration-thickness: 1px; }
+  .langs span { color: var(--ink); font-weight: 600; }
+  h1, h2, h3 { font-family: Georgia, "Iowan Old Style", "Times New Roman", Times, serif; font-weight: 600; line-height: 1.25; }
+  h1 { font-size: 2rem; margin: 18px 0 6px; letter-spacing: -0.01em; }
+  h2 { font-size: 1.25rem; margin: 40px 0 12px; padding-top: 22px; border-top: 1px solid var(--rule); }
+  h3 { font-size: 1.1rem; margin: 26px 0 2px; }
+  .standfirst { color: var(--ink-muted); margin: 0 0 6px; }
+  .accent-rule { width: 56px; height: 3px; background: var(--accent-line); margin: 20px 0 24px; }
+  p { margin: 0 0 1em; }
+  ol, ul { margin: 0 0 1em; padding-left: 1.4em; }
+  li { margin-bottom: 0.5em; }
+  .kind { color: var(--ink-muted); margin: 0 0 0.3em; font-size: 0.96rem; }
+  figure { margin: 0 0 1em; }
+  figcaption { color: var(--ink-muted); font-size: 0.95rem; margin-top: 8px; }
+  svg.ex { display: block; width: 100%; max-width: 300px; height: auto; }
+  .ex .thin { stroke: var(--hair); stroke-width: 1; }
+  .ex .thick { stroke: var(--ink); stroke-width: 3; stroke-linecap: round; }
+  .ex .frame { fill: none; stroke: var(--ink); stroke-width: 3; }
+  .ex .crown { fill: var(--crown); stroke: var(--crown); stroke-width: 1.8; stroke-linejoin: round; }
+  .ex .open { fill: var(--surface); }
+  .ex .given { fill: var(--given); }
+  .ex .sun { fill: var(--sun); stroke: var(--sun-line); stroke-width: 1.4; }
+  .ex .ray { stroke: var(--sun-line); stroke-width: 1.8; stroke-linecap: round; }
+  .ex .moon { fill: var(--primary); }
+  .ex .badge { fill: var(--surface); stroke: var(--ink); stroke-width: 1.5; }
+  .ex .badge-t { fill: var(--ink); font: 600 10px system-ui, sans-serif; text-anchor: middle; dominant-baseline: central; }
+  .ex .line { fill: none; stroke: var(--primary); stroke-width: 12; stroke-linecap: round; stroke-linejoin: round; opacity: 0.85; }
+  .ex .wall { stroke: var(--ink); stroke-width: 5; stroke-linecap: round; }
+  .ex .dot { fill: var(--ink); }
+  .ex .num { fill: var(--paper); font: 700 12px system-ui, sans-serif; text-anchor: middle; dominant-baseline: central; }
+  .ex .g0 { fill: var(--g0); } .ex .g1 { fill: var(--g1); } .ex .g2 { fill: var(--g2); } .ex .g3 { fill: var(--g3); } .ex .g4 { fill: var(--g4); } .ex .g5 { fill: var(--g5); } .ex .g6 { fill: var(--g6); } .ex .g7 { fill: var(--g7); } .ex .g8 { fill: var(--g8); } .ex .g9 { fill: var(--g9); }
+  .cta { margin: 30px 0 12px; }
+  .button {
+    display: block; text-align: center; text-decoration: none;
+    background: var(--button); color: var(--button-ink);
+    font-weight: 600; font-size: 1.08rem; line-height: 1.3;
+    padding: 15px 18px; border-radius: 12px; margin: 0 0 10px; min-height: 52px;
+  }
+  .button:hover { opacity: 0.92; color: var(--button-ink); }
+  .button:focus-visible { outline: 3px solid var(--accent); outline-offset: 3px; }
+  .app { display: flex; gap: 12px; align-items: center; margin: 0 0 1em; }
+  .app img { width: 48px; height: 48px; border-radius: 11px; flex: none; }
+  .note { color: var(--ink-muted); font-size: 0.95rem; margin: 0; }
+  a { color: var(--ink); text-decoration: underline; text-decoration-color: var(--accent-line); text-decoration-thickness: 2px; text-underline-offset: 3px; }
+  a:hover { color: var(--accent); }
+  a:focus-visible { outline: 3px solid var(--accent); outline-offset: 3px; }
+  footer { margin-top: 52px; padding-top: 24px; border-top: 1px solid var(--rule); color: var(--ink-muted); font-size: 0.95rem; }
+  footer p { margin: 0 0 0.5em; }
+
+  .play[hidden] { display: none; }
+  .rule { margin: 0 0 0.4em; }
+  .controls { color: var(--ink-muted); font-size: 0.95rem; margin: 0 0 16px; }
+  .date { color: var(--ink-muted); font-size: 0.95rem; margin: 0 0 14px; }
+  .fallback { background: var(--surface); border: 1px solid var(--rule); border-left: 3px solid var(--accent-line); padding: 10px 14px; font-size: 0.95rem; }
+  .board {
+    display: grid; width: 100%; max-width: 26rem; margin: 0 auto;
+    border: 3px solid var(--ink); background: var(--ink); touch-action: none;
+    -webkit-user-select: none; user-select: none; -webkit-tap-highlight-color: transparent;
+  }
+  .cell {
+    appearance: none; -webkit-appearance: none; margin: 0; padding: 0; border: 0; border-radius: 0;
+    aspect-ratio: 1 / 1; min-width: 0; display: block; position: relative; cursor: pointer;
+    border-right: 1px solid var(--hair); border-bottom: 1px solid var(--hair); color: var(--crown);
+  }
+  .cell.tr { border-right: 3px solid var(--ink); }
+  .cell.tb { border-bottom: 3px solid var(--ink); }
+  .cell.lc { border-right: 0; }
+  .cell.lr { border-bottom: 0; }
+  .cell:focus { outline: none; }
+  .cell:focus-visible { outline: 3px solid var(--accent); outline-offset: -4px; z-index: 1; }
+  .cell svg { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
+  .g-crown path { fill: currentColor; stroke: currentColor; stroke-width: .045; stroke-linejoin: round; }
+  .g-x path { fill: none; stroke: currentColor; stroke-width: .055; stroke-linecap: round; opacity: .88; }
+  .cell[data-v="auto"] .g-x path { opacity: .42; stroke-width: .045; }
+  .cell.bad { box-shadow: inset 0 0 0 3px var(--error); color: var(--error); }
+  .board.done .cell { cursor: default; }
+  .status { text-align: center; margin: 14px 0 6px; font-variant-numeric: tabular-nums; min-height: 1.6em; }
+  .status.won { color: var(--success); font-weight: 600; }
+  .tools { text-align: center; margin: 0 0 8px; }
+  .ghost {
+    font: inherit; font-size: 0.98rem; color: var(--ink); background: var(--surface);
+    border: 1px solid var(--rule); border-radius: 10px; padding: 9px 22px; min-height: 44px; cursor: pointer;
+  }
+  .ghost:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+  .cell.g0 { background: var(--g0); } .cell.g1 { background: var(--g1); } .cell.g2 { background: var(--g2); } .cell.g3 { background: var(--g3); } .cell.g4 { background: var(--g4); } .cell.g5 { background: var(--g5); } .cell.g6 { background: var(--g6); } .cell.g7 { background: var(--g7); } .cell.g8 { background: var(--g8); } .cell.g9 { background: var(--g9); }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <header class="masthead">
+    <p class="wordmark"><a href="../">Nimbleknot &middot; Logic Trio</a></p>
+  </header>
+
+  <main>
+    <h1>Today's Crowns</h1>
+    <p class="standfirst">The same board every Logic Trio player gets in the app today.</p>
+    <div class="accent-rule"></div>
+
+    <p class="rule">One crown in every row, column and colour. Crowns never touch, not even diagonally.</p>
+    <p class="controls">Tap once for × (ruled out), twice for a crown. Drag to paint ×. A light × marks a cell your crowns rule out.</p>
+
+    <noscript><p class="fallback">The board needs JavaScript. Today's Crowns is also in the app, with Suns &amp; Moons and Paths.</p></noscript>
+    <div class="play" id="play" hidden>
+      <p class="date" id="date"></p>
+      <p class="fallback" id="fallback" hidden></p>
+      <div class="board" id="board" role="group"></div>
+      <p class="status" id="status" role="status" aria-live="polite"></p>
+      <p class="tools"><button class="ghost" type="button" id="clear">Clear</button></p>
+    </div>
+
+    <h2>Suns &amp; Moons and Paths are in the app</h2>
+    <p>Today's page in Logic Trio has all three puzzles, and the calendar keeps every page since 17 September 2026. Free, with ads, and no ad interrupts a puzzle.</p>
+    <div class="cta">
+      <a class="button" href="https://play.google.com/store/apps/details?id=com.nimbleknot.logictrio&amp;referrer=utm_source%3Dwebsite%26utm_medium%3Dhowto%26utm_campaign%3Ddaily">Play free on Google Play</a>
+    </div>
+    <div class="app">
+      <img src="../icon-512.png" width="48" height="48" alt="" loading="lazy">
+      <p class="note">For Android 7 or newer.</p>
+    </div>
+    <p>New to Crowns? <a href="../how-to-play/crowns.html">How to play Star Battle (Crowns)</a>, with a solved example and tips. Or read about <a href="../how-to-play/">all three puzzles</a>.</p>
+  </main>
+
+  <footer>
+    <p><a href="../privacy.html">Privacy policy</a> &middot; <a href="../terms.html">Terms of use</a> &middot; <a href="../delete-data.html">Delete your data</a></p>
+    <p>Nimbleknot &middot; <a href="mailto:nimbleknot.games@gmail.com">nimbleknot.games@gmail.com</a></p>
+  </footer>
+
+</div>
+<script>
+(function () {
+  'use strict';
+  var START = '2026-09-17';
+  var P = ["3333333633344466644946668499611899966555596655555|2503164","4444444490404484100088881011888811115588111188881118888617116666|50364271","8888888884885588011550001151202211122211112221611|0251364","8000011188000000800002008088033388880033688840336688403366584444|63571402","8888688836083330002200022|14203","0004466200866822086680008638000883800118881111888|3041526","801111888111898661894461994466994444|152403","6633333666663348888338878833877810377881037777103|6203514","1111166671111666911116669911188899911844995118449990089999999999|60357241","0000111000001100000883488887448888744668874444487|4250631","5564633355666330566666805561188055668880855580908558800088888000|35241607","1188818883187331777977779|20314","8888877368877733388883333388333333044232004422220|5142603","2222177111771887798877888|13024","6611177661997766637778863777833337733333473333777|2416053","0000888833301177337111773377777433779774999999945994944459944444|73516204","9994466994466399946830004883000088800818888888888|0246135","7788884077810000888110008851100068510000665990006659999055555999|60247153","004444000444300444309948388888668888|420351","1111622111166211166221886222008444433884443334444|3642051","2222202233000334000348888|14203","9111111918166611888661118663000886400088440000444|0416352","3711688827116688271116882711188822221888442210884422000844400000|05147362","0033333008333300000339000002911020211112221116666|5240613","3333773336633323668333336888383364888800448888004490000044400000|46173025","8661188111888008400084000|24031","9111111111665510116560011666088866604484664444444|0251364","8888818788777339973399999|30241","0008836008888620888862008666201666611116661155666|5140263","9999955569696666666666446686444433868440338188803388888088888888|51460372","6633000663880866888881664888112488822244484444448|3516024","2222222022222200122222002266444076644800766668087666388877333388|36052741","8888177111771167791677666|13024","8888666088861644866164888116448111644499114433999|6053142","333666833666866666888461880011880011|140352","1778880177888418884441188444188444411166649916666|6253041","0000000000000444020033442210934412109348111088881110181861111118|37514620","6888333688004368884431183333818833388883337777733|0351624","3300000073300008739002087799111817771888111115851111155511111555|42531607","777780777180711110951100991990999999|403152","0446663844866388886638888863878553377835337333333|0253146","233666236666233666233566238588008888|240351","4444877444688744488884888888488833840003330022233|6302514","9966644499664488999664889976644895661888556688885668888853333388|63024175","5555118551111855199775599997999997799943334444333|6350241","0111166601166636001663330084633380844433888444338889444387799999|47062531","666666664666444836900833998888998888|524130","9111100977100897711889339188939955599995559999955|3526140","220000223000444000444400444888488866|024135","1164444118844409984840988884099003300000030000033|2064135","4499940034444400334448083348880833488888336555883365658833666118|31607425","4666666444661644368864438886043388204488222222222|3514206","9900001190000361900008669944086694448886444488864444888622488866|75360241","666611666111666101888800984000444444|514203","2222166222216602222260044466404486644448634448833|1405263","888811688111665177699977999777999777|352041","0011116000116600081560008556008888804488880888778|2605314","6666633368833333688300336800000268800002648801126488001264488877|04273516","2200001223400022340002244400224880044448004644888|6253041","8111199981777779888777998883799988847666884466668822666622266666|47530261","332221332222633302666800668800666880|531420","3338880668880088888802224000222494022244442224444|2036415","666644666849668889638899655559655599|403152","6644877444487700088770018777101177711117331117773|0241536","3332220833330208333300083533333835555668395555669955556699555516|31475206","0000044119984471118447718884371888437118883788888|4261530","6611110026188880211188002210000022200000222234002222333377333333|31462570","211117211199200199000099000999880999|530241","3564440356444033648403388840337788837777883333778|1426350","000000080022888002888402878812771112|250314","0000011444408144448886466638642633362266636666666|3641520","8888888888833388800024448002224489112244881222248811262281111622|04271635","2233366223355622333332220888000088800444800000000|6420531","8844433388000333811109338819993381199993885993338559993355559973|30425716","6655568559611596611966999|31420","9111111911111091118885511888566168855666385333333|0631524","0199901119081110886808888|42031","5568800556640455664445996644599664455364445533444|3504162","3333001130000018333088883300866633336666399365563995665699455555|73504162","3333044333304432200003221000222100022211082661188|5041362","3644444466444004666620446162200011662200186222001887222018877220|07361524","008555008855011156221666222662222222|530241","6666688664888766488886444080634400063300006222000|0642513","1111199788998884999844444|02413","1111111911111891911889997778395677735567775556666|4625031","2223444622004466220446662204466100004661008886610008111100009111|35160274","8885556888815688811663866662346622233322223332222|4035162","6633333966333334663303446663034461640444888444228882222288222222|73041526","220033220003222223288824288884888688|420513","0003366000336600032260044266008444644849464444946|6350241","444888994488956688553338553333553333|203514","3666111666661866666186664888644488022000002000000|0526314","3355556633566666333266663333666638866669888866998888469088444440|20351647","9088855901888599118859995885999555599933559993336|1420536","8888888888089999880099338115999981119999881116697771116677711166|02637514","0444600886088860088600833|14203","6663330663333066668006668800646110044400004499000|5146302","888000668800668811638881655851555555|403152","0888888008844411188861115566111566611666662222666|0641352","1111555511666553116555531188558711855887108888871088877700488888|03746152","1666661111111118111118800000000003042222304444330|4613520","0888888888811833811118338117177411777774117997741979999499995994|02615374","0000800088104871888711777|14203","0088866088816388111638119933881177788117778111111|5063142","000004110004111188711978717977777777|524130","4440333448888342111864218886221186622218662222226|3604251","8888888056811810566611115566611155511199555333395555533952555555|37426051","6333333663333066433008643300844430087742207772200|4160352","4800322240003332444003024400330144400001449500114999001199990011|14705362","466333488333480030440000444001444400|241350","9990333990000399100237111228777111878888888888888|6415302","5566658866553665334633333|42031","6666811666581166658814365511336662136663223333322|4630251","5993333355533333555363835666638856686880566888806666488066110000|16035742","4499911644499166881116381110838880088880008880000|4205136","3333888033333888333335883335558893356888993666887444468877666688|72640531","888553811553881153011663111666666666|135024","3333333003333322363332224449222249922224882222888|2036415","808888888838111833777739777999777799|130425","6666663668863366483336644433224220312222331222222|1362504","8880022258100022511112225516222255162233111666661111166691111166|24617530","3444611344881934881193081111300001133000003333000|4162530","1111111911111199108119990088111900872199003771940037777433377744|36204751","1777718797119971119915555|41302","8883366818666611888641188864111884411000041120004|3051642","1111117991888918999984444|41302","5556688555511855551119555511999911739977779999777|3615204","1115555511653333116663338888333388888833888800208888400044444000|30251647","3336666336666638865163888516395551655550165555016|6053142","3332264833222668333366683335558833555888338888880018088800000888|63514720","233333233000222000220080211888211668|250413","8111122899122089712228771722877777283333338888833|3615240","222200200000221880111888117888117338|153024","6666333448633308866630888333000833309999990099919|6142035","8888871148888711777777193337777933379999333399995533990955555900|30642517","9999911999991133979113337777633377766338876633844|2513046","3366662283666622888861228666612244422222444440224444400049440000|04257361","666800566888566688555643555343533333|531402","6666661666666166656813555551355555539900553399995|6153042","888122551112551116555116555166535666|253041","8866666088866688846665888336585553655516665111116|6031524","8888811588888115777111154777115544771155332779953337779933399999|47530261","8888844888664488336248036622800222280002220000021|5302416","6666666361616443111188830000833300088333590888839988888399888888|46372051","011666010863000866088866484444444444|250413","8888666788666688886668883336800033584403358833355|4025316","666666486666488861433365443555333335|315042","4811111488888108888810888866033383300033330000002|4025316","3911111139999111399991083599110833791188337111683336166633366666|53617204","0033333003004600000461088844108888411858841115884|4615203","1111611111111101188100011888800088888033887884438878843387799433|40617253","663322633222833222833212800011800111|142035","5561111566111056666106666300668833064400006444400|0514263","666333666888664480664888622888622288|305241","8551111555611155562215536221333220133322003333333|0531462","0000000020000000200034482222348822733368227333662779336677773366|20574631","5591000555110855111085116688566666855668883336688|2530461","6666666666666888616668831166640311222400111224407222444072224440|25716304","008819808819888879788873777773777333|415203","1118888111868311886661886666118442211044221104444|0641352","663888633388122300122000122200122220|153042","6633333866333386333338665599862255986625998155559|5204631","5556661655666666353666663334646822044468222448882222488822222888|61502473","8811122855111255551175551197961199996199999999999|5026314","6618888866118888661182886611127711117773919999939999499399994999|31526074","877777817777117333177353999555555555|031524","8880223888020051102205510000591110059919905599990|6142503","6330063300444084448848888|20314","0000022000000210340021033032183303318333338866663|2630514","3336622233332221334000213344000099440000944400009944800044444000|35716042","8881100880000088880038884043568444358844335584443|3526140","1111888819111188999117774999997744499777444999372409993700099997|53741602","8866688663084330033300033|30241","6666661666336664483866448888444480044408009940000|6304251","336666333388443388444330444220444222|204153","7778888777118877771119991111999111659951665555533|3142605","8864444388444433884000038800222288800112887111128777111187711111|24753061","6655511625511162551811111181111778891978889998888|0316425","4663221186635221886352228863522283335220833055008880050088000000|07263514","3333330003300994844944444|02413"];
+  var STORE_KEY = 'lt-web-daily-';
+
+  function pad(v) { return (v < 10 ? '0' : '') + v; }
+  function keyOf(d) { return d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate()); }
+  var s0 = START.split('-');
+  var startUtc = Date.UTC(+s0[0], +s0[1] - 1, +s0[2]);
+  var now = new Date();
+  var idx = Math.round((Date.UTC(now.getFullYear(), now.getMonth(), now.getDate()) - startUtc) / 864e5);
+  var fallback = idx < 0 || idx >= P.length;
+  if (fallback) idx = P.length - 1;
+  var dayUtc = new Date(startUtc + idx * 864e5);
+  var dayKey = dayUtc.getUTCFullYear() + '-' + pad(dayUtc.getUTCMonth() + 1) + '-' + pad(dayUtc.getUTCDate());
+  var parts = P[idx].split('|');
+  var g = parts[0], n = parts[1].length;
+  var reg = [];
+  for (var i = 0; i < n * n; i++) reg.push(parseInt(g.charAt(i), 36));
+
+  var $ = function (id) { return document.getElementById(id); };
+  var board = $('board'), status = $('status');
+  var dateText;
+  try {
+    dateText = dayUtc.toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric', timeZone: 'UTC' });
+  } catch (e) { dateText = dayKey; }
+  $('date').textContent = dateText + ' \u00b7 page ' + (idx + 1);
+  if (fallback) {
+    $('fallback').hidden = false;
+    $('fallback').textContent = 'This page holds the boards up to ' + dateText +
+      ', so here is that one. The app always has today\u2019s page.';
+  }
+
+  var EMPTY = 0, MARK = 1, CROWN = 2;
+  var state = [], solved = false, elapsed = 0, startedAt = null, ticker = null;
+  for (i = 0; i < n * n; i++) state.push(EMPTY);
+
+  var CROWN_SVG = '<svg class="g-crown" viewBox="0 0 1 1" aria-hidden="true"><path d="M.27 .7 L.21 .38 L.38 .52 L.5 .29 L.62 .52 L.79 .38 L.73 .7 Z"/></svg>';
+  var X_SVG = '<svg class="g-x" viewBox="0 0 1 1" aria-hidden="true"><path d="M.37 .37 L.63 .63 M.63 .37 L.37 .63"/></svg>';
+
+  function touches(a, b) {
+    return Math.abs(Math.floor(a / n) - Math.floor(b / n)) <= 1 && Math.abs(a % n - b % n) <= 1;
+  }
+  function clash(a, b) {
+    return Math.floor(a / n) === Math.floor(b / n) || a % n === b % n || reg[a] === reg[b] || touches(a, b);
+  }
+  function crowns() {
+    var out = [];
+    for (var c = 0; c < n * n; c++) if (state[c] === CROWN) out.push(c);
+    return out;
+  }
+  function conflicts(list) {
+    var bad = {};
+    for (var a = 0; a < list.length; a++)
+      for (var b = a + 1; b < list.length; b++)
+        if (clash(list[a], list[b])) { bad[list[a]] = true; bad[list[b]] = true; }
+    return bad;
+  }
+  function fmt(ms) {
+    var t = Math.floor(ms / 1000), m = Math.floor(t / 60), s = t % 60;
+    return m >= 60 ? Math.floor(m / 60) + ':' + pad(m % 60) + ':' + pad(s) : m + ':' + pad(s);
+  }
+  function timeNow() { return elapsed + (startedAt === null ? 0 : Date.now() - startedAt); }
+
+  var cells = [];
+  board.style.gridTemplateColumns = 'repeat(' + n + ', 1fr)';
+  board.setAttribute('aria-label', 'Crowns board, ' + n + ' by ' + n);
+  for (i = 0; i < n * n; i++) {
+    var b = document.createElement('button');
+    var r = Math.floor(i / n), c = i % n;
+    b.type = 'button';
+    b.className = 'cell g' + (reg[i] % 10) +
+      (c < n - 1 && reg[i + 1] !== reg[i] ? ' tr' : '') + (c === n - 1 ? ' lc' : '') +
+      (r < n - 1 && reg[i + n] !== reg[i] ? ' tb' : '') + (r === n - 1 ? ' lr' : '');
+    b.dataset.i = i;
+    b.tabIndex = i === 0 ? 0 : -1;
+    board.appendChild(b);
+    cells.push(b);
+  }
+
+  function render() {
+    var list = crowns(), bad = conflicts(list), auto = {};
+    for (var k = 0; k < list.length; k++)
+      for (var o = 0; o < n * n; o++)
+        if (o !== list[k] && state[o] !== CROWN && clash(o, list[k])) auto[o] = true;
+    for (var c = 0; c < n * n; c++) {
+      var el = cells[c], v = state[c];
+      var want = v === CROWN ? 'crown' : v === MARK ? 'x' : auto[c] ? 'auto' : '';
+      if (el.dataset.v !== want) {
+        el.dataset.v = want;
+        el.innerHTML = want === 'crown' ? CROWN_SVG : want ? X_SVG : '';
+      }
+      el.classList.toggle('bad', !!bad[c]);
+      el.setAttribute('aria-label', 'Row ' + (Math.floor(c / n) + 1) + ', column ' + (c % n + 1) +
+        (v === CROWN ? ', crown' : v === MARK ? ', crossed out' : auto[c] ? ', ruled out' : ', empty') +
+        (bad[c] ? ', breaks a rule' : ''));
+    }
+    var badCount = Object.keys(bad).length;
+    if (!solved && list.length === n && badCount === 0) {
+      solved = true;
+      elapsed = timeNow();
+      startedAt = null;
+      if (ticker) { clearInterval(ticker); ticker = null; }
+      save();
+    }
+    board.classList.toggle('done', solved);
+    status.classList.toggle('won', solved);
+    if (solved) {
+      status.textContent = 'Solved! Your time: ' + fmt(elapsed) + '.' + (fallback ? '' : ' Same board as in the app today.');
+    } else {
+      var t = timeNow();
+      status.textContent = list.length + ' of ' + n + ' crowns' +
+        (badCount ? ' \u00b7 a crown breaks a rule' : '') + (t > 0 ? ' \u00b7 ' + fmt(t) : '');
+    }
+  }
+
+  function save() {
+    try {
+      localStorage.setItem(STORE_KEY + dayKey, JSON.stringify({ s: state.join(''), t: timeNow(), done: solved }));
+    } catch (e) { /* storage blocked: progress stays in this tab only */ }
+  }
+  function load() {
+    try {
+      for (var k = localStorage.length - 1; k >= 0; k--) {
+        var name = localStorage.key(k);
+        if (name && name.indexOf(STORE_KEY) === 0 && name !== STORE_KEY + dayKey) localStorage.removeItem(name);
+      }
+      var raw = localStorage.getItem(STORE_KEY + dayKey);
+      if (!raw) return;
+      var d = JSON.parse(raw);
+      if (typeof d.s !== 'string' || d.s.length !== n * n) return;
+      for (var c = 0; c < n * n; c++) state[c] = +d.s.charAt(c) || 0;
+      elapsed = +d.t || 0;
+      solved = !!d.done;
+    } catch (e) { /* ignore */ }
+  }
+
+  function startClock() {
+    if (solved || startedAt !== null) return;
+    startedAt = Date.now();
+    if (!ticker) ticker = setInterval(render, 1000);
+  }
+  function changed() { startClock(); render(); save(); }
+  function cycle(c) {
+    if (solved) return;
+    state[c] = state[c] === EMPTY ? MARK : state[c] === MARK ? CROWN : EMPTY;
+    changed();
+  }
+  function paint(c) {
+    if (solved || state[c] !== EMPTY) return false;
+    state[c] = MARK;
+    return true;
+  }
+
+  // Pointer: a tap cycles; a drag paints x on empty cells.
+  var downCell = -1, dragging = false, lastCell = -1;
+  function cellAt(x, y) {
+    var el = document.elementFromPoint(x, y);
+    el = el && el.closest ? el.closest('.cell') : null;
+    return el && board.contains(el) ? +el.dataset.i : -1;
+  }
+  board.addEventListener('pointerdown', function (e) {
+    if (e.button !== undefined && e.button !== 0) return;
+    var c = cellAt(e.clientX, e.clientY);
+    if (c < 0) return;
+    downCell = c; lastCell = c; dragging = false;
+    if (board.setPointerCapture) { try { board.setPointerCapture(e.pointerId); } catch (err) { /* ignore */ } }
+    e.preventDefault();
+  });
+  board.addEventListener('pointermove', function (e) {
+    if (downCell < 0) return;
+    var c = cellAt(e.clientX, e.clientY);
+    if (c < 0 || c === lastCell) return;
+    var any = false;
+    if (!dragging) { dragging = true; any = paint(downCell); }
+    any = paint(c) || any;
+    lastCell = c;
+    if (any) changed();
+  });
+  function up() {
+    if (downCell >= 0 && !dragging) { cycle(downCell); focusCell(downCell, false); }
+    downCell = -1; dragging = false;
+  }
+  board.addEventListener('pointerup', up);
+  board.addEventListener('pointercancel', function () { downCell = -1; dragging = false; });
+  // Keyboard: Enter or Space cycles (clicks from a pointer are handled above).
+  board.addEventListener('click', function (e) {
+    if (e.detail !== 0) return;
+    var el = e.target.closest('.cell');
+    if (el) cycle(+el.dataset.i);
+  });
+  board.addEventListener('keydown', function (e) {
+    var el = e.target.closest('.cell');
+    if (!el) return;
+    var c = +el.dataset.i, r = Math.floor(c / n), col = c % n;
+    var moves = { ArrowUp: [-1, 0], ArrowDown: [1, 0], ArrowLeft: [0, -1], ArrowRight: [0, 1] };
+    var m = moves[e.key];
+    if (!m) return;
+    e.preventDefault();
+    var nr = Math.min(n - 1, Math.max(0, r + m[0])), nc = Math.min(n - 1, Math.max(0, col + m[1]));
+    focusCell(nr * n + nc, true);
+  });
+  function focusCell(t, scroll) {
+    for (var c = 0; c < n * n; c++) cells[c].tabIndex = c === t ? 0 : -1;
+    try { cells[t].focus({ preventScroll: !scroll }); } catch (err) { /* ignore */ }
+  }
+
+  $('clear').addEventListener('click', function () {
+    for (var c = 0; c < n * n; c++) state[c] = EMPTY;
+    solved = false; elapsed = 0; startedAt = null;
+    if (ticker) { clearInterval(ticker); ticker = null; }
+    render(); save();
+  });
+
+  load();
+  render();
+  $('play').hidden = false;
+})();
+</script>
+</body>
+</html>
