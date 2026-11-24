@@ -9,31 +9,38 @@
 <meta property="og:title" content="Today's logic puzzles | Logic Trio">
 <meta property="og:description" content="Three free logic puzzles every day: a star battle (queens) puzzle, a binary puzzle and a number path. No sign-up, no install. New boards at midnight.">
 <meta property="og:url" content="https://nimbleknot.github.io/logictrio/today/">
-<meta property="og:image" content="https://nimbleknot.github.io/logictrio/share.png">
+<meta property="og:image" content="https://nimbleknot.github.io/logictrio/today/img/share-today.png">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="theme-color" content="#FAF7F2" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#12141C" media="(prefers-color-scheme: dark)">
 <link rel="icon" href="../icon-512.png">
 <link rel="preload" href="fonts/fraunces.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="app.css?v=55fb5bd3">
+<link rel="stylesheet" href="app.css?v=fec3c973">
 </head>
 <body>
-<main class="page narrow">
+<main class="page narrow v2">
   <section id="home">
     <div class="top"><a class="brand disp" href="../">Logic Trio</a><a class="chip" data-play="home_top" href="https://play.google.com/store/apps/details?id=com.nimbleknot.logictrio">Get the app</a></div>
-    <div class="date" id="date"></div>
-    <h1 class="disp">Today's puzzles</h1>
-    <p class="sub">Three new logic puzzles every day. Free, no sign-up.</p>
-    <p class="note" id="fallnote"></p>
-    <a class="daycard" id="daycard" href="crowns/"><div class="qtile disp" aria-hidden="true">?</div><div class="marks" id="marks"></div><div class="dayline" id="dayline">Solve all three to reveal today's picture</div></a>
-    <a class="main" id="play" href="crowns/">Play: Crowns</a>
-    <nav class="rows" id="rows" aria-label="Today's three puzzles">
-      <a class="row" href="crowns/"><span class="name">Crowns</span></a>
-      <a class="row" href="suns-and-moons/"><span class="name">Suns &amp; Moons</span></a>
-      <a class="row" href="paths/"><span class="name">Paths</span></a>
-    </nav>
-    <div class="app"><img src="../icon-512.png" alt="" width="64" height="64"><b>Logic Trio for Android</b><p>Keep your streak, draw each day's picture, and play practice levels offline.</p>
-      <a class="go" data-play="home" href="https://play.google.com/store/apps/details?id=com.nimbleknot.logictrio">Get it on Google Play</a></div>
+    <div class="two">
+      <div>
+        <div class="date" id="date"></div>
+        <h1 class="disp">Today's puzzles</h1>
+        <p class="reassure"><span>Free</span><span>No sign-up</span><span>New at midnight</span></p>
+        <p class="note" id="fallnote"></p>
+        <nav class="cards" id="cards" aria-label="Today's three puzzles">
+          <a class="pcard" href="crowns/"><span class="t"><span class="nm disp">Crowns</span></span></a>
+          <a class="pcard" href="suns-and-moons/"><span class="t"><span class="nm disp">Suns &amp; Moons</span></span></a>
+          <a class="pcard" href="paths/"><span class="t"><span class="nm disp">Paths</span></span></a>
+        </nav>
+        <a class="main" id="play" href="crowns/">Play: Crowns</a>
+      </div>
+      <div class="side">
+        <div class="pics" id="pics"><h2 class="disp">A new picture every day</h2><p id="picsline">Solve all three to reveal today's.</p><div class="strip" id="strip"></div></div>
+        <div class="app2"><div class="phone"><img src="img/app-month.png" alt="Logic Trio's calendar of day pictures" width="94" height="190" loading="lazy"></div><div><b>Logic Trio for Android</b>
+          <ul><li><i style="background:var(--tCrowns)"><svg viewBox="0 0 24 24" width="15" height="15" aria-hidden="true"><path d="M12 3c1 3.5 5 5.5 5 10a5 5 0 0 1-10 0c0-2.5 1.4-4 2.5-5 .2 1.8 1 2.8 2 3.2C11 9 11 6 12 3Z" fill="#E0662C"/></svg></i>Keep your daily streak</li><li><i style="background:var(--tSuns)"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="var(--primary)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20l4-1 10-10-3-3L5 16Z"/></svg></i>Draw each day's picture</li><li><i style="background:var(--tPaths)"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="var(--pathsGlyph)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="4" width="7" height="7" rx="1.5"/><rect x="13" y="4" width="7" height="7" rx="1.5"/><rect x="4" y="13" width="7" height="7" rx="1.5"/><rect x="13" y="13" width="7" height="7" rx="1.5"/></svg></i>3,600 practice puzzles</li></ul>
+          <a class="go2" data-play="home" href="https://play.google.com/store/apps/details?id=com.nimbleknot.logictrio">Get it on Google Play</a><small>Free · plays offline</small></div></div>
+      </div>
+    </div>
   </section>
   <section id="complete" hidden>
     <div class="ctop"><button id="close" aria-label="Back to today's puzzles"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
@@ -48,7 +55,7 @@
   </section>
   <div class="foot"><a href="../">Nimbleknot</a><a href="../how-to-play/">How to play</a><a href="../privacy.html">Privacy</a><a href="../terms.html">Terms</a></div>
 </main>
-<script src="days.js?v=55fb5bd3"></script>
-<script src="app.js?v=55fb5bd3"></script>
+<script src="days.js?v=fec3c973"></script>
+<script src="app.js?v=fec3c973"></script>
 </body>
 </html>

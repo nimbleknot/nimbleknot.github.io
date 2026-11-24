@@ -718,27 +718,83 @@
   // =====================================================================
   //  Today's page and the complete view
   // =====================================================================
+  // ---------- the front page (row H, his "all ok but show the board filled like half", 25 Nov)
+  // The small boards are YESTERDAY's, about half solved: today's half-filled would give away today's answers.
+  var TAG = { crowns: 'One crown in every row, column and colour', suns: 'Balance suns and moons in every line', paths: 'One line through every number and cell' };
+  function thumb(mode, p) {
+    var n = p.n, c = B / n, o = '', i, k, ink = C['--ink'], grid = C['--grid'];
+    var lines = function () { var s = ''; for (var j = 1; j < n; j++) s += '<path d="M' + j * c + ' 0V' + B + 'M0 ' + j * c + 'H' + B + '" stroke="' + grid + '" stroke-width="2"/>'; return s; };
+    if (mode === 'crowns') {
+      var reg = [], sol = [];
+      for (i = 0; i < n * n; i++) reg.push(parseInt(p.g.charAt(i), 36));
+      for (i = 0; i < n; i++) sol.push(parseInt(p.s.charAt(i), 36));
+      for (i = 0; i < n * n; i++) o += '<rect x="' + (i % n) * c + '" y="' + Math.floor(i / n) * c + '" width="' + (c + 0.5) + '" height="' + (c + 0.5) + '" fill="' + C.regions[reg[i] % 10] + '"/>';
+      o += lines();
+      for (i = 0; i < n * n; i++) {
+        var x = (i % n) * c, y = Math.floor(i / n) * c;
+        if (i % n < n - 1 && reg[i] !== reg[i + 1]) o += '<path d="M' + (x + c) + ' ' + y + 'V' + (y + c) + '" stroke="' + ink + '" stroke-width="7" stroke-linecap="round"/>';
+        if (Math.floor(i / n) < n - 1 && reg[i] !== reg[i + n]) o += '<path d="M' + x + ' ' + (y + c) + 'H' + (x + c) + '" stroke="' + ink + '" stroke-width="7" stroke-linecap="round"/>';
+      }
+      var half = Math.ceil(n / 2), crowns = [];
+      for (i = 0; i < half; i++) crowns.push(i * n + sol[i]);
+      for (i = 0; i < n * n; i++) {
+        var cx = (i % n) * c + c / 2, cy = Math.floor(i / n) * c + c / 2;
+        if (crowns.indexOf(i) >= 0) o += crownSvg(cx, cy, c * 1.15, ink); // crowns only: x marks are noise at this size
+      }
+    } else if (mode === 'suns') {
+      for (i = 0; i < n * n; i++) if (p.g.charAt(i) !== '.') o += '<rect x="' + (i % n) * c + '" y="' + Math.floor(i / n) * c + '" width="' + c + '" height="' + c + '" fill="' + C['--given'] + '"/>';
+      o += lines();
+      var upTo = Math.floor(n / 2) * n;
+      for (i = 0; i < n * n; i++) {
+        var sx = (i % n) * c + c / 2, sy = Math.floor(i / n) * c + c / 2;
+        var v = p.g.charAt(i) === 'S' ? '0' : p.g.charAt(i) === 'M' ? '1' : (i < upTo ? p.s.charAt(i) : null);
+        if (v === '0') o += sunSvg(sx, sy, c * 1.1); else if (v === '1') o += moonSvg(sx, sy, c * 1.1, 'tm' + i);
+      }
+    } else {
+      o += lines();
+      var parts = p.s.split(':'), cell = +parts[0], path = [cell], steps = Math.round(parts[1].length * 0.45);
+      for (k = 0; k < steps; k++) { var d = parts[1].charAt(k); cell += d === 'R' ? 1 : d === 'L' ? -1 : d === 'D' ? n : -n; path.push(cell); }
+      var pt = function (q) { return [(q % n) * c + c / 2, Math.floor(q / n) * c + c / 2]; };
+      o += '<polyline points="' + path.map(function (q) { return pt(q).join(','); }).join(' ') + '" fill="none" stroke="' + C['--primary'] + '" stroke-width="' + c * 0.42 + '" stroke-linecap="round" stroke-linejoin="round" opacity="0.9"/>';
+      p.w.forEach(function (w, j) {
+        var q = pt(w), hit = path.indexOf(w) >= 0;
+        o += '<circle cx="' + q[0] + '" cy="' + q[1] + '" r="' + c * 0.32 + '" fill="' + (hit ? ink : C['--surface']) + '" stroke="' + ink + '" stroke-width="5"/>' +
+          '<text x="' + q[0] + '" y="' + (q[1] + c * 0.12) + '" text-anchor="middle" font-family="Mukta,sans-serif" font-weight="700" font-size="' + c * 0.36 + '" fill="' + (hit ? C['--surface'] : ink) + '">' + (j + 1) + '</text>';
+      });
+    }
+    return '<svg viewBox="0 0 ' + B + ' ' + B + '" aria-hidden="true">' + o + '</svg>';
+  }
   function homePage() {
     setText('date', dateLong());
     if (fallback) setText('fallnote', 'This page holds the boards up to 15 March 2027, so here is that day. The app always has today’s page.');
-    var rows = '';
-    MODES.forEach(function (m) {
+    var keys = Object.keys(DAYS.d).sort(), at = keys.indexOf(dayKey);
+    var prev = DAYS.d[keys[Math.max(0, at - 1)]];
+    var tick = '<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg>';
+    var chev = '<svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 5 7 7-7 7"/></svg>';
+    $('cards').innerHTML = MODES.map(function (m, j) {
       var p = PUZ[m], d = saved[m].done;
-      rows += '<a class="row" href="' + SLUG[m] + '/">' + tile(m) + '<span class="name">' + NAMES[m] + '</span><span class="meta' + (d ? ' done' : '') + '">' +
-        (d ? fmt(saved[m].t) : (TIER[p.k] || '') + ' · ' + p.n + '×' + p.n) + '</span><svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 5 7 7-7 7"/></svg></a>';
-    });
-    $('rows').innerHTML = rows;
-    $('marks').innerHTML = MODES.map(function (m) { return tile(m, true, !saved[m].done); }).join('');
-    var nx = nextOpen();
-    var main = $('play');
-    if (nx) { main.textContent = 'Play: ' + NAMES[nx]; main.href = SLUG[nx] + '/'; $('daycard').href = SLUG[nx] + '/'; }
-    else { main.textContent = 'Today’s picture'; main.href = '#picture'; $('daycard').href = '#picture'; }
-    var solvedN = MODES.filter(function (m) { return saved[m].done; }).length;
-    setText('dayline', solvedN === 3 ? 'Today’s picture is ready' : 'Solve all three to reveal today’s picture');
-    if (solvedN === 3 && day.pic) {
-      var q = document.querySelector('.qtile');
-      q.textContent = ''; q.classList.add('shown');
-      q.innerHTML = '<img src="pictures/day_' + day.pic.key + '.png" alt="' + day.pic.name + '" width="84" height="84">';
+      return '<a class="pcard" href="' + SLUG[m] + '/"><span class="thumb">' + thumb(m, prev.p[j]) + '</span><span class="t"><span class="nm disp">' + NAMES[m] +
+        '</span><span class="tag">' + TAG[m] + '</span><span class="meta"><span class="chip">' + (TIER[p.k] || '') + ' · ' + p.n + '×' + p.n + '</span></span></span><span class="end">' +
+        (d ? '<span class="ok">' + tick + '</span><b>' + fmt(saved[m].t) + '</b>' : chev) + '</span></a>';
+    }).join('');
+    var nx = nextOpen(), main = $('play');
+    if (nx) { main.textContent = 'Play: ' + NAMES[nx]; main.href = SLUG[nx] + '/'; }
+    else { main.textContent = 'Today’s picture'; main.href = '#picture'; }
+    // a new picture every day: the last six, then today's
+    var shown = [], j2;
+    for (j2 = at - 1; j2 >= 0 && shown.length < 6; j2--) if (DAYS.d[keys[j2]].pic) shown.unshift(keys[j2]);
+    var all = allDone();
+    if (!shown.length && !day.pic) { $('pics').hidden = true; }
+    else {
+      var cells = shown.map(function (k) {
+        var pc = DAYS.d[k].pic, dd = new Date(+k.slice(0, 4), +k.slice(5, 7) - 1, +k.slice(8, 10)), lab;
+        try { lab = dd.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' }); } catch (e) { lab = k.slice(8); }
+        return '<div class="day"><span class="pt"><img src="pictures/day_' + pc.key + '.png" alt="' + pc.name + '" loading="lazy"></span><small>' + lab + '</small></div>';
+      });
+      if (day.pic) cells.push('<div class="day today"><span class="pt">' + (all ? '<img src="pictures/day_' + day.pic.key + '.png" alt="' + day.pic.name + '">' : '?') + '</span><small>Today</small></div>');
+      $('strip').style.gridTemplateColumns = 'repeat(' + cells.length + ',1fr)';
+      $('strip').innerHTML = cells.join('');
+      setText('picsline', !day.pic ? 'Collect every day’s picture in the app.' : all ? 'Today’s is ' + day.pic.name + '. Collect them all in the app.' : 'Solve all three to reveal today’s.');
     }
     route();
   }
