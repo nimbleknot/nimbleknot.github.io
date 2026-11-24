@@ -19,6 +19,29 @@
   var SITE = 'https://nimbleknot.github.io/logictrio/today/';
   var $ = function (id) { return document.getElementById(id); };
 
+  // ---------- the visit counter (GoatCounter, D-250): no cookies, no IP kept, nothing stored for it.
+  // Our own few lines in place of count.js, so the page loads no code from elsewhere.
+  var GC = document.documentElement.getAttribute('data-gc') || '';
+  function gc(path, title, isEvent) {
+    if (!GC || /^(localhost|127\.|192\.168\.|10\.)/.test(location.hostname) || document.visibilityState === 'prerender') return;
+    if (navigator.webdriver) return;
+    var d = { p: path, t: title || document.title, e: isEvent ? 'true' : '', s: String(screen.width), rnd: Math.random().toString(36).slice(2, 7) };
+    if (!isEvent) { d.r = document.referrer; d.q = location.search; }
+    var q = [];
+    for (var k in d) if (d[k]) q.push(k + '=' + encodeURIComponent(d[k]));
+    var url = GC + '?' + q.join('&');
+    try { if (navigator.sendBeacon && navigator.sendBeacon(url)) return; } catch (e) { /* fall back */ }
+    var img = new Image(); img.src = url;
+  }
+  // Where the visitor came from (?utm_source=instagram on our profile links), kept for this visit only,
+  // so the app button's Play link says which profile sent the store visit.
+  var SRC = '';
+  try {
+    var m = /[?&](?:utm_source|source)=([a-z0-9_-]{1,24})/i.exec(location.search);
+    if (m) sessionStorage.setItem('lt-src', m[1].toLowerCase());
+    SRC = sessionStorage.getItem('lt-src') || '';
+  } catch (e) { SRC = ''; }
+
   // ---------- storage (a convenience only: everything works without it)
   function load(k) { try { return JSON.parse(localStorage.getItem(k)); } catch (e) { return null; } }
   function save(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) { /* private window */ } }
@@ -387,6 +410,8 @@
     function win() {
       stopClock();
       rec.done = true; rec.t = elapsed; rec.st = st; persist();
+      gc('solved-' + mode, 'Solved ' + NAMES[mode], true);
+      if (allDone()) gc('page-complete', 'All three solved', true);
       var el = $('rule');
       el.textContent = 'Solved in ' + fmt(rec.t); el.classList.remove('msg'); void el.offsetWidth; el.classList.add('msg');
       showDone();
@@ -562,6 +587,7 @@
   function wireShare() {
     var b = $('share'); if (!b) return;
     b.onclick = function () {
+      gc('share', 'Share result', true);
       var text = shareText();
       if (navigator.share) { navigator.share({ text: text }).catch(function () { /* closed */ }); return; }
       var done = function () { setText('tomorrow', 'Copied · paste it anywhere'); setTimeout(function () { setText('tomorrow', 'New puzzles at midnight'); }, 2000); };
@@ -574,7 +600,14 @@
   readColours();
   if (/[?&]selftest/.test(location.search)) window.LT_TEST = { Crowns: Crowns, Suns: Suns, Paths: Paths };
   var links = document.querySelectorAll('a[data-play]');
-  for (var i = 0; i < links.length; i++) links[i].href = PLAY + links[i].getAttribute('data-play');
+  for (var i = 0; i < links.length; i++) {
+    (function (a) {
+      var camp = (SRC ? SRC + '_' : '') + a.getAttribute('data-play');
+      a.href = PLAY + camp;
+      a.addEventListener('click', function () { gc('app-' + camp, 'App button', true); });
+    })(links[i]);
+  }
+  gc(location.pathname, document.title, false);
   if (VIEW === 'home') { homePage(); wireShare(); window.addEventListener('hashchange', route); }
   else puzzlePage(VIEW);
 })();
