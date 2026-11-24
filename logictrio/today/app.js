@@ -84,6 +84,27 @@
     return '<span class="' + (small ? 'mk' : 'tile') + (off ? ' off' : '') + '" style="background:var(--t' + m.charAt(0).toUpperCase() + m.slice(1) + ');color:' + col + '">' + ICON[m] + '</span>';
   }
 
+  // ---------- the solve celebration, as the game draws it (board_view.dart: the wave and _burst)
+  var ANIM = null; // { ms, n } while a solve plays
+  function wave(i, n, cx, cy, inner) {
+    if (!ANIM) return inner;
+    var u = (ANIM.ms - (Math.floor(i / n) + i % n) * (560 / (2 * n))) / 320;
+    if (u <= 0 || u >= 1) return inner;
+    var k = 1 + 0.2 * Math.sin(u * Math.PI);
+    return '<g transform="translate(' + cx + ' ' + cy + ') scale(' + k + ') translate(' + (-cx) + ' ' + (-cy) + ')">' + inner + '</g>';
+  }
+  function burst() {
+    if (!ANIM) return '';
+    var t = (ANIM.ms - 520) / 700;
+    if (t <= 0 || t >= 1) return '';
+    var e = 1 - Math.pow(1 - t, 3), reach = B * (0.12 + 0.5 * e), o = '';
+    for (var k = 0; k < 12; k++) {
+      var a = k * Math.PI / 6 + 0.26, r = reach * (k % 2 ? 0.78 : 1);
+      o += '<circle cx="' + (B / 2 + Math.cos(a) * r) + '" cy="' + (B / 2 + Math.sin(a) * r) + '" r="' + B * 0.014 * (1.4 - t) + '" fill="' + C['--accent'] + '" opacity="' + (1 - t) + '"/>';
+    }
+    return o;
+  }
+
   // ---------- the day
   var DAYS = window.LT_DAYS;
   var today = keyOf(new Date());
@@ -166,7 +187,7 @@
           var cx = (i % n) * c + c / 2, cy = Math.floor(i / n) * c + c / 2, v = st.charAt(i);
           var hot = flash && flash.indexOf(i) >= 0;
           if (hot) o += '<rect x="' + (cx - c / 2 + 3) + '" y="' + (cy - c / 2 + 3) + '" width="' + (c - 6) + '" height="' + (c - 6) + '" rx="6" fill="none" stroke="' + C['--error'] + '" stroke-width="3"/>';
-          if (v === '2') o += crownSvg(cx, cy, c, bad[i] && !won ? C['--error'] : C['--ink']);
+          if (v === '2') o += wave(i, n, cx, cy, crownSvg(cx, cy, c, bad[i] && !won ? C['--error'] : C['--ink']));
           else if (v === '1') o += crossSvg(cx, cy, c, 0.85);
           else if (auto[i]) o += crossSvg(cx, cy, c, 0.45);
         }
@@ -211,7 +232,7 @@
         for (i = 0; i < n * n; i++) {
           var x = (i % n) * c + c / 2, y = Math.floor(i / n) * c + c / 2, v = st.charAt(i);
           if (bad[i] || (flash && flash.indexOf(i) >= 0)) o += '<rect x="' + (x - c / 2 + 3) + '" y="' + (y - c / 2 + 3) + '" width="' + (c - 6) + '" height="' + (c - 6) + '" rx="6" fill="none" stroke="' + C['--error'] + '" stroke-width="3"/>';
-          if (v === '1') o += sunSvg(x, y, c); else if (v === '2') o += moonSvg(x, y, c, 'mm' + i);
+          if (v === '1') o += wave(i, n, x, y, sunSvg(x, y, c)); else if (v === '2') o += wave(i, n, x, y, moonSvg(x, y, c, 'mm' + i));
         }
         links.forEach(function (l) {
           var x = (l.a % n) * c, y = Math.floor(l.a / n) * c;
@@ -287,14 +308,14 @@
         });
         function pt(i) { return [(i % n) * c + c / 2, Math.floor(i / n) * c + c / 2]; }
         if (flash) flash.forEach(function (f) { var q = pt(f); o += '<rect x="' + (q[0] - c / 2 + 3) + '" y="' + (q[1] - c / 2 + 3) + '" width="' + (c - 6) + '" height="' + (c - 6) + '" rx="6" fill="none" stroke="' + C['--error'] + '" stroke-width="3"/>'; });
-        if (path.length > 1) o += '<polyline points="' + path.map(function (q) { return pt(q).join(','); }).join(' ') + '" fill="none" stroke="' + (won ? C['--success'] : C['--primary']) +
+        if (path.length > 1) o += '<polyline points="' + path.map(function (q) { return pt(q).join(','); }).join(' ') + '" fill="none" stroke="' + C['--primary'] +
           '" stroke-width="' + c * 0.42 + '" stroke-linecap="round" stroke-linejoin="round" opacity="0.9"/>';
         else if (path.length === 1) { var q0 = pt(path[0]); o += '<circle cx="' + q0[0] + '" cy="' + q0[1] + '" r="' + c * 0.21 + '" fill="' + C['--primary'] + '" opacity="0.9"/>'; }
         var on = {}; path.forEach(function (q) { on[q] = 1; });
         p.w.forEach(function (w, k) {
           var q = pt(w), hit = on[w];
-          o += '<circle cx="' + q[0] + '" cy="' + q[1] + '" r="' + c * 0.3 + '" fill="' + (hit ? C['--ink'] : C['--surface']) + '" stroke="' + C['--ink'] + '" stroke-width="2.4"/>' +
-            '<text x="' + q[0] + '" y="' + (q[1] + c * 0.11) + '" text-anchor="middle" font-family="Mukta,sans-serif" font-weight="700" font-size="' + c * 0.32 + '" fill="' + (hit ? C['--surface'] : C['--ink']) + '">' + (k + 1) + '</text>';
+          o += wave(w, n, q[0], q[1], '<circle cx="' + q[0] + '" cy="' + q[1] + '" r="' + c * 0.3 + '" fill="' + (hit ? C['--ink'] : C['--surface']) + '" stroke="' + C['--ink'] + '" stroke-width="2.4"/>' +
+            '<text x="' + q[0] + '" y="' + (q[1] + c * 0.11) + '" text-anchor="middle" font-family="Mukta,sans-serif" font-weight="700" font-size="' + c * 0.32 + '" fill="' + (hit ? C['--surface'] : C['--ink']) + '">' + (k + 1) + '</text>');
         });
         if (path.length && !won) { var e = pt(path[path.length - 1]); o += '<circle cx="' + e[0] + '" cy="' + e[1] + '" r="' + c * 0.34 + '" fill="none" stroke="' + C['--accentLine'] + '" stroke-width="2.6"/>'; }
         return o;
@@ -347,7 +368,7 @@
       if (!rec.done) msgTimer = setTimeout(function () { el.textContent = RULE[mode]; el.classList.remove('msg'); }, 2000);
     }
     function render() {
-      svg.innerHTML = g.draw(st, flash, rec.done);
+      svg.innerHTML = g.draw(st, flash, rec.done) + burst();
       setText('count', g.count(st));
       $('undo').disabled = rec.done || !undo.length;
       $('redo').disabled = rec.done || !redo.length;
@@ -368,8 +389,19 @@
       rec.done = true; rec.t = elapsed; rec.st = st; persist();
       var el = $('rule');
       el.textContent = 'Solved in ' + fmt(rec.t); el.classList.remove('msg'); void el.offsetWidth; el.classList.add('msg');
-      boardEl.classList.add('won');
       showDone();
+      celebrate();
+    }
+    function celebrate() {
+      if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+      var t0 = null;
+      function frame(ts) {
+        if (t0 === null) t0 = ts;
+        ANIM = { ms: ts - t0 };
+        render();
+        if (ANIM.ms < 1260) requestAnimationFrame(frame); else { ANIM = null; render(); }
+      }
+      requestAnimationFrame(frame);
     }
     function showDone() {
       $('tools').hidden = true;
