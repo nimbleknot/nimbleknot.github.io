@@ -11,7 +11,7 @@
   <url><loc>https://nimbleknot.github.io/logictrio/press/id/</loc><lastmod>2026-11-01</lastmod></url>
   <url><loc>https://nimbleknot.github.io/logictrio/press/de/</loc><lastmod>2026-11-01</lastmod></url>
   <url><loc>https://nimbleknot.github.io/logictrio/press/fr/</loc><lastmod>2026-11-01</lastmod></url>
-  <url><loc>https://nimbleknot.github.io/logictrio/privacy.html</loc><lastmod>2026-11-01</lastmod></url>
+  <url><loc>https://nimbleknot.github.io/logictrio/privacy.html</loc><lastmod>2026-11-25</lastmod></url>
   <url><loc>https://nimbleknot.github.io/logictrio/terms.html</loc><lastmod>2026-11-01</lastmod></url>
   <url><loc>https://nimbleknot.github.io/logictrio/delete-data.html</loc><lastmod>2026-11-01</lastmod></url>
   <url><loc>https://nimbleknot.github.io/logictrio/how-to-play/</loc><lastmod>2026-11-01</lastmod></url>
@@ -66,5 +66,8 @@
   <url><loc>https://nimbleknot.github.io/logictrio/how-to-play/ko/crowns.html</loc><lastmod>2026-11-01</lastmod></url>
   <url><loc>https://nimbleknot.github.io/logictrio/how-to-play/ko/suns-and-moons.html</loc><lastmod>2026-11-01</lastmod></url>
   <url><loc>https://nimbleknot.github.io/logictrio/how-to-play/ko/paths.html</loc><lastmod>2026-11-01</lastmod></url>
-  <url><loc>https://nimbleknot.github.io/logictrio/daily/</loc><lastmod>2026-11-01</lastmod></url>
+  <url><loc>https://nimbleknot.github.io/logictrio/today/</loc><lastmod>2026-11-25</lastmod><changefreq>daily</changefreq></url>
+  <url><loc>https://nimbleknot.github.io/logictrio/today/crowns/</loc><lastmod>2026-11-25</lastmod><changefreq>daily</changefreq></url>
+  <url><loc>https://nimbleknot.github.io/logictrio/today/suns-and-moons/</loc><lastmod>2026-11-25</lastmod><changefreq>daily</changefreq></url>
+  <url><loc>https://nimbleknot.github.io/logictrio/today/paths/</loc><lastmod>2026-11-25</lastmod><changefreq>daily</changefreq></url>
 </urlset>

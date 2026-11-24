@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="en" data-view="crowns" data-root="../">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Today's Crowns: a free daily star battle (queens) puzzle | Logic Trio</title>
+<meta name="description" content="Play today's Crowns puzzle free in your browser: one crown in every row, column and colour, and crowns never touch. A new star battle board every day.">
+<link rel="canonical" href="https://nimbleknot.github.io/logictrio/today/crowns/">
+<meta property="og:title" content="Today's Crowns: a free daily star battle (queens) puzzle | Logic Trio">
+<meta property="og:description" content="Play today's Crowns puzzle free in your browser: one crown in every row, column and colour, and crowns never touch. A new star battle board every day.">
+<meta property="og:url" content="https://nimbleknot.github.io/logictrio/today/crowns/">
+<meta property="og:image" content="https://nimbleknot.github.io/logictrio/share.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="theme-color" content="#FAF7F2" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#12141C" media="(prefers-color-scheme: dark)">
+<link rel="icon" href="../../icon-512.png">
+<link rel="preload" href="../fonts/fraunces.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="../app.css">
+</head>
+<body>
+<main class="page">
+  <div class="wide">
+    <div>
+      <div class="ptop"><a href="../" aria-label="Back to today's puzzles"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg></a>
+        <h1 class="ttl disp" id="title"></h1><div class="clock" id="clock" aria-label="Time">0:00</div></div>
+      <p class="note" id="fallnote"></p>
+      <div class="rule" id="rule" aria-live="polite"></div>
+      <div class="board" id="board"></div>
+      <div class="count" id="count"></div>
+      <div class="tools" id="tools">
+        <button id="undo"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 14 4 9l5-5"/><path d="M4 9h10.5a5.5 5.5 0 0 1 0 11H11"/></svg>Undo</button>
+        <button id="redo"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m15 14 5-5-5-5"/><path d="M20 9H9.5a5.5 5.5 0 0 0 0 11H13"/></svg>Redo</button>
+        <button id="clear"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 12a8 8 0 1 1-2.4-5.7"/><path d="M20 4v5h-5"/></svg>Clear</button>
+        <button id="check"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.5" y="3.5" width="17" height="17" rx="3"/><path d="m7.5 12.5 2.5 2.5 6-6"/></svg>Check</button>
+      </div>
+      <a class="main next" id="next" href="../" hidden>Next</a>
+    </div>
+    <div class="below">
+      <h2 class="disp">Today's Crowns puzzle</h2>
+      <p>A star battle puzzle, also called a queens puzzle. A new board every day at midnight, your time. Free, in any browser, no sign-up.</p>
+      <h3>How to play</h3>
+      <ul><li>Tap a cell once to mark it with ×, twice for a crown, a third time to empty it.</li><li>Each row, each column and each colour gets exactly one crown.</li><li>Two crowns never touch, not even at a corner. Cells a crown rules out show a faint × for you.</li></ul>
+      <h3>Today's other two</h3>
+      <div class="others"><a href="../suns-and-moons/"><span class="mk" style="background:var(--tSuns);color:"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="10" r="5" fill="#F2A93B" stroke="#B86E00" stroke-width="1.2"/><path d="M15.5 9.5a5.5 5.5 0 1 0 4 9.3 4.4 4.4 0 0 1-4-9.3Z" style="fill:var(--primary)"/></svg></span>Suns &amp; Moons</a><a href="../paths/"><span class="mk" style="background:var(--tPaths);color:var(--pathsGlyph)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 6h11a3 3 0 0 1 0 6H8a3 3 0 0 0 0 6h11"/></svg></span>Paths</a></div>
+
+      <div class="app"><img src="../../icon-512.png" alt="" width="64" height="64"><b>Logic Trio for Android</b><p>Keep your streak, draw each day's picture, and play practice levels offline.</p>
+        <a class="go" data-play="crowns" href="https://play.google.com/store/apps/details?id=com.nimbleknot.logictrio">Get it on Google Play</a></div>
+      <div class="foot"><a href="../../">Nimbleknot</a><a href="../../how-to-play/">How to play</a><a href="../../privacy.html">Privacy</a><a href="../../terms.html">Terms</a></div>
+    </div>
+  </div>
+</main>
+<script src="../days.js"></script>
+<script src="../app.js"></script>
+</body>
+</html>

@@ -1,0 +1,548 @@
+/* Logic Trio, today's puzzles on the web (D-233 step 5, D-249).
+ * The same three boards the app shows that day, from the game's own pack
+ * (days.json is written by tool/web_today/build.py). No sign-in, no tracker:
+ * the browser keeps today's boards and times in localStorage, nothing else. */
+(function () {
+  'use strict';
+  var ROOT = document.documentElement.getAttribute('data-root') || './';
+  var VIEW = document.documentElement.getAttribute('data-view') || 'home';
+  var MODES = ['crowns', 'suns', 'paths'];
+  var NAMES = { crowns: 'Crowns', suns: 'Suns & Moons', paths: 'Paths' };
+  var SLUG = { crowns: 'crowns', suns: 'suns-and-moons', paths: 'paths' };
+  var TIER = { easy: 'Easy', medium: 'Medium', hard: 'Hard', expert: 'Expert' };
+  var RULE = {
+    crowns: 'One crown in every row, column and colour.\nCrowns never touch, not even diagonally.',
+    suns: 'As many suns as moons in every row and column.\nNo three alike in a row. Between cells: = same, × different.',
+    paths: 'Draw one line from 1 to the last number, through the numbers in order, filling every cell.'
+  };
+  var PLAY = 'https://play.google.com/store/apps/details?id=com.nimbleknot.logictrio&referrer=utm_source%3Dwebsite%26utm_medium%3Dtoday%26utm_campaign%3D';
+  var SITE = 'https://nimbleknot.github.io/logictrio/today/';
+  var $ = function (id) { return document.getElementById(id); };
+
+  // ---------- storage (a convenience only: everything works without it)
+  function load(k) { try { return JSON.parse(localStorage.getItem(k)); } catch (e) { return null; } }
+  function save(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) { /* private window */ } }
+  function prune(keep) {
+    try {
+      for (var i = localStorage.length - 1; i >= 0; i--) {
+        var name = localStorage.key(i);
+        if (name && name.indexOf('lt-today-') === 0 && name !== keep) localStorage.removeItem(name);
+      }
+    } catch (e) { /* ignore */ }
+  }
+
+  // ---------- dates
+  function pad(v) { return (v < 10 ? '0' : '') + v; }
+  function keyOf(d) { return d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate()); }
+  function fmt(ms) {
+    var t = Math.floor(ms / 1000), m = Math.floor(t / 60), s = t % 60;
+    return m >= 60 ? Math.floor(m / 60) + ':' + pad(m % 60) + ':' + pad(s) : m + ':' + pad(s);
+  }
+
+  // ---------- glyphs, drawn as the game draws them (lib/game/board_view.dart)
+  function css(k) { return getComputedStyle(document.documentElement).getPropertyValue(k).trim(); }
+  var C = {};
+  function readColours() {
+    ['--ink', '--accent', '--accentLine', '--primary', '--surface', '--given', '--grid', '--error', '--success'].forEach(function (k) { C[k] = css(k); });
+    var dark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+    C.regions = dark
+      ? ['#46387E', '#7D7219', '#AD5E76', '#304429', '#4D4949', '#62699F', '#895A44', '#357365', '#095663', '#644005']
+      : ['#6AA4CF', '#FEE888', '#E9BFC1', '#A99D3B', '#D3EDBA', '#95B09A', '#B1BEFC', '#8ECAD4', '#FF9577', '#C68BA8'];
+    C.dark = dark;
+  }
+  function crownSvg(x, y, s, col) {
+    var w = s * 0.62, h = s * 0.42, l = x - w / 2, t = y - h / 2;
+    return '<path d="M' + l + ' ' + (t + h * 0.25) + 'L' + (l + w * 0.25) + ' ' + (t + h * 0.62) + 'L' + x + ' ' + t + 'L' + (l + w * 0.75) + ' ' + (t + h * 0.62) +
+      'L' + (l + w) + ' ' + (t + h * 0.25) + 'L' + (l + w * 0.9) + ' ' + (t + h) + 'L' + (l + w * 0.1) + ' ' + (t + h) + 'Z" fill="' + col + '" stroke="' + col +
+      '" stroke-width="' + s * 0.04 + '" stroke-linejoin="round"/>';
+  }
+  function sunSvg(x, y, s) {
+    var r = '';
+    for (var k = 0; k < 8; k++) {
+      var a = k * Math.PI / 4, c = Math.cos(a), d = Math.sin(a);
+      r += '<line x1="' + (x + c * s * 0.27) + '" y1="' + (y + d * s * 0.27) + '" x2="' + (x + c * s * 0.34) + '" y2="' + (y + d * s * 0.34) +
+        '" stroke="' + C['--accentLine'] + '" stroke-width="' + s * 0.045 + '" stroke-linecap="round"/>';
+    }
+    return r + '<circle cx="' + x + '" cy="' + y + '" r="' + s * 0.2 + '" fill="' + C['--accent'] + '" stroke="' + C['--accentLine'] + '" stroke-width="' + s * 0.035 + '"/>';
+  }
+  function moonSvg(x, y, s, id) {
+    return '<mask id="' + id + '"><rect x="' + (x - s) + '" y="' + (y - s) + '" width="' + 2 * s + '" height="' + 2 * s + '" fill="#fff"/><circle cx="' + (x + s * 0.13) +
+      '" cy="' + (y - s * 0.08) + '" r="' + s * 0.2 + '" fill="#000"/></mask><circle cx="' + x + '" cy="' + y + '" r="' + s * 0.26 + '" fill="' + C['--primary'] + '" mask="url(#' + id + ')"/>';
+  }
+  function crossSvg(x, y, s, op, col) {
+    var u = s * 0.12;
+    return '<path d="M' + (x - u) + ' ' + (y - u) + 'L' + (x + u) + ' ' + (y + u) + 'M' + (x + u) + ' ' + (y - u) + 'L' + (x - u) + ' ' + (y + u) +
+      '" stroke="' + (col || C['--ink']) + '" stroke-width="' + s * 0.04 + '" stroke-linecap="round" opacity="' + op + '"/>';
+  }
+  var ICON = {
+    crowns: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3.5 8.5 8 13l4-7 4 7 4.5-4.5-1.6 10H5.1Z" fill="currentColor"/></svg>',
+    suns: '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="10" r="5" fill="#F2A93B" stroke="#B86E00" stroke-width="1.2"/><path d="M15.5 9.5a5.5 5.5 0 1 0 4 9.3 4.4 4.4 0 0 1-4-9.3Z" style="fill:var(--primary)"/></svg>',
+    paths: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 6h11a3 3 0 0 1 0 6H8a3 3 0 0 0 0 6h11"/></svg>'
+  };
+  function tile(m, small, off) {
+    var col = m === 'crowns' ? 'var(--ink)' : m === 'paths' ? 'var(--pathsGlyph)' : '';
+    return '<span class="' + (small ? 'mk' : 'tile') + (off ? ' off' : '') + '" style="background:var(--t' + m.charAt(0).toUpperCase() + m.slice(1) + ');color:' + col + '">' + ICON[m] + '</span>';
+  }
+
+  // ---------- the day
+  var DAYS = window.LT_DAYS;
+  var today = keyOf(new Date());
+  var dayKey = today, fallback = false;
+  if (!DAYS.d[dayKey]) {
+    var keys = Object.keys(DAYS.d).sort();
+    dayKey = today < keys[0] ? keys[0] : keys[keys.length - 1];
+    fallback = true;
+  }
+  var day = DAYS.d[dayKey];
+  var PUZ = { crowns: day.p[0], suns: day.p[1], paths: day.p[2] };
+  var STORE = 'lt-today-' + dayKey;
+  prune(STORE);
+  var saved = load(STORE) || {};
+  MODES.forEach(function (m) { if (!saved[m]) saved[m] = { st: null, t: 0, done: false }; });
+  function persist() { save(STORE, saved); }
+  function dateLong() {
+    var p = dayKey.split('-');
+    var d = new Date(+p[0], +p[1] - 1, +p[2]);
+    try { return d.toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long' }); } catch (e) { return dayKey; }
+  }
+  function dateShort() {
+    var p = dayKey.split('-');
+    var d = new Date(+p[0], +p[1] - 1, +p[2]);
+    try { return d.toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short' }); } catch (e) { return dayKey; }
+  }
+  function nextOpen(after) {
+    var start = after ? MODES.indexOf(after) + 1 : 0;
+    for (var i = 0; i < 3; i++) { var m = MODES[(start + i) % 3]; if (!saved[m].done) return m; }
+    return null;
+  }
+  function allDone() { return saved.crowns.done && saved.suns.done && saved.paths.done; }
+  function setText(id, t) { var el = $(id); if (el) el.textContent = t; }
+
+  // =====================================================================
+  //  The boards
+  // =====================================================================
+  var B = 360; // viewBox size
+
+  function Crowns(p) {
+    var n = p.n, reg = [], sol = [];
+    for (var i = 0; i < n * n; i++) reg.push(parseInt(p.g.charAt(i), 36));
+    for (i = 0; i < n; i++) sol.push(parseInt(p.s.charAt(i), 36));
+    function clash(a, b) {
+      var ra = Math.floor(a / n), rb = Math.floor(b / n), ca = a % n, cb = b % n;
+      return ra === rb || ca === cb || reg[a] === reg[b] || (Math.abs(ra - rb) <= 1 && Math.abs(ca - cb) <= 1);
+    }
+    return {
+      n: n, cells: n * n,
+      blank: function () { var s = ''; for (var i = 0; i < n * n; i++) s += '0'; return s; },
+      // 0 empty, 1 ×, 2 crown
+      tap: function (st, i) { var v = (+st.charAt(i) + 1) % 3; return st.slice(0, i) + v + st.slice(i + 1); },
+      count: function (st) { var k = 0; for (var i = 0; i < st.length; i++) if (st.charAt(i) === '2') k++; return k + ' / ' + n + ' crowns'; },
+      solved: function (st) {
+        for (var r = 0; r < n; r++) for (var c = 0; c < n; c++) if ((st.charAt(r * n + c) === '2') !== (sol[r] === c)) return false;
+        return true;
+      },
+      wrong: function (st) {
+        var w = [];
+        for (var i = 0; i < n * n; i++) {
+          var isSol = sol[Math.floor(i / n)] === i % n;
+          if ((st.charAt(i) === '2' && !isSol) || (st.charAt(i) === '1' && isSol)) w.push(i);
+        }
+        return w;
+      },
+      draw: function (st, flash, won) {
+        var c = B / n, o = '', crowns = [], i, k;
+        for (i = 0; i < n * n; i++) if (st.charAt(i) === '2') crowns.push(i);
+        var bad = {}, auto = {};
+        for (i = 0; i < crowns.length; i++) for (k = i + 1; k < crowns.length; k++) if (clash(crowns[i], crowns[k])) { bad[crowns[i]] = 1; bad[crowns[k]] = 1; }
+        for (i = 0; i < crowns.length; i++) for (k = 0; k < n * n; k++) if (k !== crowns[i] && st.charAt(k) !== '2' && clash(k, crowns[i])) auto[k] = 1;
+        for (i = 0; i < n * n; i++) o += '<rect x="' + (i % n) * c + '" y="' + Math.floor(i / n) * c + '" width="' + (c + 0.5) + '" height="' + (c + 0.5) + '" fill="' + C.regions[reg[i] % 10] + '"/>';
+        for (i = 1; i < n; i++) o += '<path d="M' + i * c + ' 0V' + B + 'M0 ' + i * c + 'H' + B + '" stroke="' + C['--grid'] + '"/>';
+        for (i = 0; i < n * n; i++) {
+          var x = (i % n) * c, y = Math.floor(i / n) * c;
+          if (i % n < n - 1 && reg[i] !== reg[i + 1]) o += '<path d="M' + (x + c) + ' ' + y + 'V' + (y + c) + '" stroke="' + C['--ink'] + '" stroke-width="3" stroke-linecap="round"/>';
+          if (Math.floor(i / n) < n - 1 && reg[i] !== reg[i + n]) o += '<path d="M' + x + ' ' + (y + c) + 'H' + (x + c) + '" stroke="' + C['--ink'] + '" stroke-width="3" stroke-linecap="round"/>';
+        }
+        for (i = 0; i < n * n; i++) {
+          var cx = (i % n) * c + c / 2, cy = Math.floor(i / n) * c + c / 2, v = st.charAt(i);
+          var hot = flash && flash.indexOf(i) >= 0;
+          if (hot) o += '<rect x="' + (cx - c / 2 + 3) + '" y="' + (cy - c / 2 + 3) + '" width="' + (c - 6) + '" height="' + (c - 6) + '" rx="6" fill="none" stroke="' + C['--error'] + '" stroke-width="3"/>';
+          if (v === '2') o += crownSvg(cx, cy, c, bad[i] && !won ? C['--error'] : C['--ink']);
+          else if (v === '1') o += crossSvg(cx, cy, c, 0.85);
+          else if (auto[i]) o += crossSvg(cx, cy, c, 0.45);
+        }
+        return o;
+      },
+      label: function (i) { return 'Row ' + (Math.floor(i / n) + 1) + ', column ' + (i % n + 1); }
+    };
+  }
+
+  function Suns(p) {
+    var n = p.n, links = [];
+    (p.l || []).forEach(function (l) {
+      var m = /^(\d+)([RD])(.)$/.exec(l);
+      if (m) links.push({ a: +m[1], b: +m[1] + (m[2] === 'R' ? 1 : n), right: m[2] === 'R', same: m[3] === '=' });
+    });
+    function given(i) { return p.g.charAt(i) !== '.'; }
+    return {
+      n: n, cells: n * n,
+      // 0 empty, 1 sun, 2 moon (givens S / M)
+      blank: function () { var s = ''; for (var i = 0; i < n * n; i++) s += p.g.charAt(i) === 'S' ? '1' : p.g.charAt(i) === 'M' ? '2' : '0'; return s; },
+      tap: function (st, i) { if (given(i)) return st; var v = (+st.charAt(i) + 1) % 3; return st.slice(0, i) + v + st.slice(i + 1); },
+      count: function (st) { var k = 0; for (var i = 0; i < st.length; i++) if (st.charAt(i) !== '0') k++; return k + ' / ' + n * n + ' cells'; },
+      solved: function (st) { for (var i = 0; i < n * n; i++) if (+st.charAt(i) !== +p.s.charAt(i) + 1) return false; return true; },
+      wrong: function (st) { var w = []; for (var i = 0; i < n * n; i++) if (st.charAt(i) !== '0' && +st.charAt(i) !== +p.s.charAt(i) + 1) w.push(i); return w; },
+      draw: function (st, flash) {
+        var c = B / n, o = '', i;
+        // rule breaks: three alike in a line, too many of one in a line, a broken = or ×
+        var bad = {};
+        function line(get) {
+          var cnt = { 1: 0, 2: 0 }, idx = [];
+          for (var k = 0; k < n; k++) { idx.push(get(k)); var v = st.charAt(get(k)); if (v !== '0') cnt[v]++; }
+          for (k = 0; k + 2 < n; k++) { var a = st.charAt(idx[k]); if (a !== '0' && a === st.charAt(idx[k + 1]) && a === st.charAt(idx[k + 2])) { bad[idx[k]] = bad[idx[k + 1]] = bad[idx[k + 2]] = 1; } }
+          ['1', '2'].forEach(function (v) { if (cnt[v] > n / 2) idx.forEach(function (j) { if (st.charAt(j) === v) bad[j] = 1; }); });
+        }
+        for (var r = 0; r < n; r++) { line(function (k) { return r * n + k; }); line(function (k) { return k * n + r; }); }
+        links.forEach(function (l) {
+          var a = st.charAt(l.a), b = st.charAt(l.b);
+          if (a !== '0' && b !== '0' && ((a === b) !== l.same)) { bad[l.a] = 1; bad[l.b] = 1; }
+        });
+        for (i = 0; i < n * n; i++) if (given(i)) o += '<rect x="' + (i % n) * c + '" y="' + Math.floor(i / n) * c + '" width="' + c + '" height="' + c + '" fill="' + C['--given'] + '"/>';
+        for (i = 1; i < n; i++) o += '<path d="M' + i * c + ' 0V' + B + 'M0 ' + i * c + 'H' + B + '" stroke="' + C['--grid'] + '"/>';
+        for (i = 0; i < n * n; i++) {
+          var x = (i % n) * c + c / 2, y = Math.floor(i / n) * c + c / 2, v = st.charAt(i);
+          if (bad[i] || (flash && flash.indexOf(i) >= 0)) o += '<rect x="' + (x - c / 2 + 3) + '" y="' + (y - c / 2 + 3) + '" width="' + (c - 6) + '" height="' + (c - 6) + '" rx="6" fill="none" stroke="' + C['--error'] + '" stroke-width="3"/>';
+          if (v === '1') o += sunSvg(x, y, c); else if (v === '2') o += moonSvg(x, y, c, 'mm' + i);
+        }
+        links.forEach(function (l) {
+          var x = (l.a % n) * c, y = Math.floor(l.a / n) * c;
+          var cx = l.right ? x + c : x + c / 2, cy = l.right ? y + c / 2 : y + c, r = c * 0.14, ink = C['--ink'];
+          o += '<circle cx="' + cx + '" cy="' + cy + '" r="' + r + '" fill="' + C['--surface'] + '" stroke="' + ink + '" stroke-width="1.6"/>';
+          o += l.same
+            ? '<path d="M' + (cx - r * 0.45) + ' ' + (cy - r * 0.25) + 'h' + r * 0.9 + 'M' + (cx - r * 0.45) + ' ' + (cy + r * 0.25) + 'h' + r * 0.9 + '" stroke="' + ink + '" stroke-width="1.6" stroke-linecap="round"/>'
+            : '<path d="M' + (cx - r * 0.38) + ' ' + (cy - r * 0.38) + 'l' + r * 0.76 + ' ' + r * 0.76 + 'M' + (cx + r * 0.38) + ' ' + (cy - r * 0.38) + 'l' + (-r * 0.76) + ' ' + r * 0.76 + '" stroke="' + ink + '" stroke-width="1.6" stroke-linecap="round"/>';
+        });
+        return o;
+      },
+      label: function (i) { return 'Row ' + (Math.floor(i / n) + 1) + ', column ' + (i % n + 1); }
+    };
+  }
+
+  function Paths(p) {
+    var n = p.n, walls = {}, sol = [];
+    (p.x || []).forEach(function (w) { var m = /^(\d+)([RD])$/.exec(w); if (m) walls[+m[1] + ':' + (+m[1] + (m[2] === 'R' ? 1 : n))] = 1; });
+    var parts = p.s.split(':'), cell = +parts[0];
+    sol.push(cell);
+    for (var k = 0; k < parts[1].length; k++) { var d = parts[1].charAt(k); cell += d === 'R' ? 1 : d === 'L' ? -1 : d === 'D' ? n : -n; sol.push(cell); }
+    function wall(a, b) { return walls[Math.min(a, b) + ':' + Math.max(a, b)]; }
+    function canStep(a, b) {
+      if (b < 0 || b >= n * n) return false;
+      var ra = Math.floor(a / n), rb = Math.floor(b / n);
+      if (!((ra === rb && Math.abs(a - b) === 1) || Math.abs(a - b) === n)) return false;
+      return !wall(a, b);
+    }
+    function wp(c) { return p.w.indexOf(c); }
+    function parse(st) { return st ? st.split('.').map(Number) : []; }
+    function nextNumber(path) { var k = 0; path.forEach(function (c) { if (wp(c) === k) k++; }); return k; }
+    var api = {
+      n: n, cells: n * n, isPaths: true,
+      blank: function () { return ''; },
+      parse: parse,
+      // add a cell to the line (or take steps back); returns the new state or null when refused
+      step: function (st, to) {
+        var path = parse(st);
+        var at = path.indexOf(to);
+        if (at >= 0) return path.slice(0, at + 1).join('.');
+        if (!path.length) return to === p.w[0] ? String(to) : null;
+        if (!canStep(path[path.length - 1], to)) return null;
+        var w = wp(to);
+        if (w >= 0 && w !== nextNumber(path)) return null;
+        if (path[path.length - 1] === p.w[p.w.length - 1]) return null;
+        return path.concat([to]).join('.');
+      },
+      count: function (st) { return parse(st).length + ' / ' + n * n + ' cells'; },
+      solved: function (st) {
+        var path = parse(st);
+        if (path.length !== n * n || path[0] !== p.w[0] || path[path.length - 1] !== p.w[p.w.length - 1]) return false;
+        var seen = {}, k = 0;
+        for (var i = 0; i < path.length; i++) {
+          if (seen[path[i]]) return false; seen[path[i]] = 1;
+          if (i && !canStep(path[i - 1], path[i])) return false;
+          var w = wp(path[i]); if (w >= 0) { if (w !== k) return false; k++; }
+        }
+        return k === p.w.length;
+      },
+      wrong: function (st) {
+        var path = parse(st), i = 0;
+        while (i < path.length && path[i] === sol[i]) i++;
+        return path.slice(i);
+      },
+      draw: function (st, flash, won) {
+        var c = B / n, o = '', path = parse(st), i;
+        for (i = 1; i < n; i++) o += '<path d="M' + i * c + ' 0V' + B + 'M0 ' + i * c + 'H' + B + '" stroke="' + C['--grid'] + '"/>';
+        Object.keys(walls).forEach(function (key) {
+          var a = +key.split(':')[0], b = +key.split(':')[1], x = (a % n) * c, y = Math.floor(a / n) * c;
+          o += b === a + 1
+            ? '<path d="M' + (x + c) + ' ' + y + 'V' + (y + c) + '" stroke="' + C['--ink'] + '" stroke-width="5" stroke-linecap="round"/>'
+            : '<path d="M' + x + ' ' + (y + c) + 'H' + (x + c) + '" stroke="' + C['--ink'] + '" stroke-width="5" stroke-linecap="round"/>';
+        });
+        function pt(i) { return [(i % n) * c + c / 2, Math.floor(i / n) * c + c / 2]; }
+        if (flash) flash.forEach(function (f) { var q = pt(f); o += '<rect x="' + (q[0] - c / 2 + 3) + '" y="' + (q[1] - c / 2 + 3) + '" width="' + (c - 6) + '" height="' + (c - 6) + '" rx="6" fill="none" stroke="' + C['--error'] + '" stroke-width="3"/>'; });
+        if (path.length > 1) o += '<polyline points="' + path.map(function (q) { return pt(q).join(','); }).join(' ') + '" fill="none" stroke="' + (won ? C['--success'] : C['--primary']) +
+          '" stroke-width="' + c * 0.42 + '" stroke-linecap="round" stroke-linejoin="round" opacity="0.9"/>';
+        else if (path.length === 1) { var q0 = pt(path[0]); o += '<circle cx="' + q0[0] + '" cy="' + q0[1] + '" r="' + c * 0.21 + '" fill="' + C['--primary'] + '" opacity="0.9"/>'; }
+        var on = {}; path.forEach(function (q) { on[q] = 1; });
+        p.w.forEach(function (w, k) {
+          var q = pt(w), hit = on[w];
+          o += '<circle cx="' + q[0] + '" cy="' + q[1] + '" r="' + c * 0.3 + '" fill="' + (hit ? C['--ink'] : C['--surface']) + '" stroke="' + C['--ink'] + '" stroke-width="2.4"/>' +
+            '<text x="' + q[0] + '" y="' + (q[1] + c * 0.11) + '" text-anchor="middle" font-family="Mukta,sans-serif" font-weight="700" font-size="' + c * 0.32 + '" fill="' + (hit ? C['--surface'] : C['--ink']) + '">' + (k + 1) + '</text>';
+        });
+        if (path.length && !won) { var e = pt(path[path.length - 1]); o += '<circle cx="' + e[0] + '" cy="' + e[1] + '" r="' + c * 0.34 + '" fill="none" stroke="' + C['--accentLine'] + '" stroke-width="2.6"/>'; }
+        return o;
+      },
+      label: function (i) { return 'Row ' + (Math.floor(i / n) + 1) + ', column ' + (i % n + 1); },
+      end: function (st) { var path = parse(st); return path.length ? path[path.length - 1] : -1; },
+      canStep: canStep
+    };
+    return api;
+  }
+
+  // =====================================================================
+  //  A puzzle page
+  // =====================================================================
+  function puzzlePage(mode) {
+    var p = PUZ[mode];
+    var g = mode === 'crowns' ? Crowns(p) : mode === 'suns' ? Suns(p) : Paths(p);
+    var rec = saved[mode];
+    var st = rec.st !== null && rec.st !== undefined ? rec.st : g.blank();
+    var undo = [], redo = [], elapsed = rec.t || 0, startedAt = null, ticker = null, flash = null, flashTimer = null, msgTimer = null;
+    var boardEl = $('board'), svg;
+
+    setText('title', NAMES[mode] + ' · ' + (TIER[p.k] || ''));
+    if (fallback) setText('fallnote', 'This page holds the boards up to 15 March 2027, so here is that day. The app always has today’s page.');
+
+    boardEl.innerHTML = '<svg viewBox="0 0 ' + B + ' ' + B + '" role="img" aria-label="' + NAMES[mode] + ' board, ' + g.n + ' by ' + g.n + '"></svg>';
+    svg = boardEl.firstChild;
+
+    function now() { return elapsed + (startedAt === null ? 0 : Date.now() - startedAt); }
+    function tick() { setText('clock', fmt(now())); }
+    function startClock() {
+      if (rec.done || startedAt !== null) return;
+      startedAt = Date.now();
+      ticker = setInterval(tick, 500);
+    }
+    function stopClock() {
+      if (startedAt !== null) { elapsed += Date.now() - startedAt; startedAt = null; }
+      if (ticker) { clearInterval(ticker); ticker = null; }
+      tick();
+    }
+    document.addEventListener('visibilitychange', function () {
+      if (document.hidden) { if (startedAt !== null) { stopClock(); rec.t = elapsed; persist(); rec._paused = true; } }
+      else if (rec._paused) { rec._paused = false; startClock(); }
+    });
+
+    function message(text) {
+      var el = $('rule');
+      clearTimeout(msgTimer);
+      el.textContent = text; el.classList.remove('msg'); void el.offsetWidth; el.classList.add('msg');
+      if (!rec.done) msgTimer = setTimeout(function () { el.textContent = RULE[mode]; el.classList.remove('msg'); }, 2000);
+    }
+    function render() {
+      svg.innerHTML = g.draw(st, flash, rec.done);
+      setText('count', g.count(st));
+      $('undo').disabled = rec.done || !undo.length;
+      $('redo').disabled = rec.done || !redo.length;
+      $('clear').disabled = rec.done || st === g.blank();
+      $('check').disabled = rec.done;
+    }
+    function commit(next) {
+      if (next === null || next === st) return false;
+      undo.push(st); redo = [];
+      st = next; rec.st = st;
+      startClock();
+      if (g.solved(st)) win(); else { rec.t = now(); persist(); }
+      render();
+      return true;
+    }
+    function win() {
+      stopClock();
+      rec.done = true; rec.t = elapsed; rec.st = st; persist();
+      var el = $('rule');
+      el.textContent = 'Solved in ' + fmt(rec.t); el.classList.remove('msg'); void el.offsetWidth; el.classList.add('msg');
+      boardEl.classList.add('won');
+      showDone();
+    }
+    function showDone() {
+      $('tools').hidden = true;
+      var nx = nextOpen(mode), a = $('next');
+      a.hidden = false;
+      if (nx) { a.textContent = 'Next: ' + NAMES[nx]; a.href = ROOT + SLUG[nx] + '/'; }
+      else { a.textContent = 'Today’s picture'; a.href = ROOT + '#picture'; }
+    }
+
+    // input
+    function cellAt(ev) {
+      var r = svg.getBoundingClientRect();
+      var x = (ev.clientX - r.left) / r.width, y = (ev.clientY - r.top) / r.height;
+      if (x < 0 || y < 0 || x >= 1 || y >= 1) return -1;
+      return Math.floor(y * g.n) * g.n + Math.floor(x * g.n);
+    }
+    if (g.isPaths) {
+      var dragging = false, dragStartSt = null;
+      boardEl.addEventListener('pointerdown', function (ev) {
+        if (rec.done) return;
+        var i = cellAt(ev); if (i < 0) return;
+        var path = g.parse(st), next = null;
+        if (path.indexOf(i) >= 0) next = g.step(st, i);                 // back to a cell on the line
+        else if (path.length && g.step(st, i) !== null) next = g.step(st, i); // one step on from the end
+        else if (i === PUZ.paths.w[0]) next = String(i);                 // start again from 1
+        if (next === null) return;
+        dragging = true; dragStartSt = st;
+        try { boardEl.setPointerCapture(ev.pointerId); } catch (e) { /* ignore */ }
+        if (next !== st) { st = next; rec.st = st; startClock(); render(); }
+        ev.preventDefault();
+      });
+      boardEl.addEventListener('pointermove', function (ev) {
+        if (!dragging) return;
+        var i = cellAt(ev); if (i < 0) return;
+        var guard = 0;
+        // walk one cell at a time towards the finger, so a fast drag never skips a cell
+        while (g.end(st) !== i && guard++ < g.cells) {
+          var e = g.end(st), er = Math.floor(e / g.n), ec = e % g.n, tr = Math.floor(i / g.n), tc = i % g.n;
+          var path = g.parse(st), back = path.length > 1 ? path[path.length - 2] : -1;
+          var to = Math.abs(tr - er) >= Math.abs(tc - ec) ? e + (tr > er ? g.n : -g.n) : e + (tc > ec ? 1 : -1);
+          if (path.indexOf(i) >= 0 && path.indexOf(i) < path.length - 1 && to !== back) { to = i; }
+          var next = g.step(st, to);
+          if (next === null || next === st) break;
+          st = next; rec.st = st;
+        }
+        render();
+      });
+      var endDrag = function () {
+        if (!dragging) return;
+        dragging = false;
+        if (st !== dragStartSt) {
+          undo.push(dragStartSt); redo = [];
+          if (g.solved(st)) win(); else { rec.t = now(); persist(); }
+          render();
+        }
+      };
+      boardEl.addEventListener('pointerup', endDrag);
+      boardEl.addEventListener('pointercancel', endDrag);
+    } else {
+      boardEl.addEventListener('pointerdown', function (ev) {
+        if (rec.done) return;
+        var i = cellAt(ev); if (i < 0) return;
+        commit(g.tap(st, i));
+        ev.preventDefault();
+      });
+    }
+    // keyboard: arrows move a focus ring, Space / Enter acts (Crowns, Suns & Moons)
+    boardEl.tabIndex = 0;
+    boardEl.addEventListener('keydown', function (ev) {
+      if (rec.done || g.isPaths) return;
+      var f = boardEl._f || 0, n = g.n;
+      if (ev.key === 'ArrowRight') f = Math.min(n * n - 1, f + 1);
+      else if (ev.key === 'ArrowLeft') f = Math.max(0, f - 1);
+      else if (ev.key === 'ArrowDown') f = Math.min(n * n - 1, f + n);
+      else if (ev.key === 'ArrowUp') f = Math.max(0, f - n);
+      else if (ev.key === ' ' || ev.key === 'Enter') { commit(g.tap(st, f)); }
+      else return;
+      boardEl._f = f; ev.preventDefault();
+      render();
+      var c = B / n;
+      svg.innerHTML += '<rect x="' + ((f % n) * c + 2) + '" y="' + (Math.floor(f / n) * c + 2) + '" width="' + (c - 4) + '" height="' + (c - 4) + '" rx="6" fill="none" stroke="' + C['--accentLine'] + '" stroke-width="3"/>';
+      boardEl.setAttribute('aria-label', g.label(f));
+    });
+
+    $('undo').onclick = function () { if (!undo.length) return; redo.push(st); st = undo.pop(); rec.st = st; persist(); render(); };
+    $('redo').onclick = function () { if (!redo.length) return; undo.push(st); st = redo.pop(); rec.st = st; persist(); if (g.solved(st)) win(); render(); };
+    $('clear').onclick = function () { if (commit(g.blank())) message('Cleared · Undo brings it back'); };
+    $('check').onclick = function () {
+      var w = g.wrong(st);
+      clearTimeout(flashTimer);
+      if (!w.length) { message('All good so far'); return; }
+      flash = w.slice(0, 3);
+      message(w.length === 1 ? '1 cell is wrong' : w.length + ' cells are wrong');
+      render();
+      flashTimer = setTimeout(function () { flash = null; render(); }, 2000);
+    };
+
+    if (rec.done) {
+      $('rule').textContent = 'Solved in ' + fmt(rec.t); $('rule').classList.add('msg');
+      showDone();
+    } else {
+      $('rule').textContent = RULE[mode];
+    }
+    tick();
+    render();
+    window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function () { readColours(); render(); });
+  }
+
+  // =====================================================================
+  //  Today's page and the complete view
+  // =====================================================================
+  function homePage() {
+    setText('date', dateLong());
+    if (fallback) setText('fallnote', 'This page holds the boards up to 15 March 2027, so here is that day. The app always has today’s page.');
+    var rows = '';
+    MODES.forEach(function (m) {
+      var p = PUZ[m], d = saved[m].done;
+      rows += '<a class="row" href="' + SLUG[m] + '/">' + tile(m) + '<span class="name">' + NAMES[m] + '</span><span class="meta' + (d ? ' done' : '') + '">' +
+        (d ? fmt(saved[m].t) : (TIER[p.k] || '') + ' · ' + p.n + '×' + p.n) + '</span><svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 5 7 7-7 7"/></svg></a>';
+    });
+    $('rows').innerHTML = rows;
+    $('marks').innerHTML = MODES.map(function (m) { return tile(m, true, !saved[m].done); }).join('');
+    var nx = nextOpen();
+    var main = $('play');
+    if (nx) { main.textContent = 'Play: ' + NAMES[nx]; main.href = SLUG[nx] + '/'; $('daycard').href = SLUG[nx] + '/'; }
+    else { main.textContent = 'Today’s picture'; main.href = '#picture'; $('daycard').href = '#picture'; }
+    var solvedN = MODES.filter(function (m) { return saved[m].done; }).length;
+    setText('dayline', solvedN === 3 ? 'Today’s picture is ready' : 'Solve all three to reveal today’s picture');
+    if (solvedN === 3 && day.pic) {
+      var q = document.querySelector('.qtile');
+      q.textContent = ''; q.classList.add('shown');
+      q.innerHTML = '<img src="pictures/day_' + day.pic.key + '.png" alt="' + day.pic.name + '" width="84" height="84">';
+    }
+    route();
+  }
+  function completeView() {
+    var pic = day.pic;
+    var img = $('picimg');
+    if (pic) {
+      img.src = 'pictures/day_' + pic.key + '.png'; img.alt = pic.name;
+      setText('picname', pic.name); setText('fact', pic.fact);
+    } else {
+      img.src = '../icon-512.png'; img.alt = 'Logic Trio';
+      setText('picname', 'Page complete'); setText('fact', 'All three of today’s puzzles, solved.');
+    }
+    $('times').innerHTML = MODES.map(function (m) { return '<div>' + tile(m, true) + fmt(saved[m].t) + '</div>'; }).join('');
+  }
+  function route() {
+    var showPic = location.hash === '#picture' && allDone();
+    $('home').hidden = showPic;
+    $('complete').hidden = !showPic;
+    if (showPic) { completeView(); window.scrollTo(0, 0); }
+  }
+  function shareText() {
+    var e = { crowns: '👑', suns: '☀️', paths: '〰️' };
+    return 'Logic Trio · ' + dateShort() + '\n' + MODES.map(function (m) { return e[m] + ' ' + fmt(saved[m].t); }).join('  ') + '\n' + SITE;
+  }
+  function wireShare() {
+    var b = $('share'); if (!b) return;
+    b.onclick = function () {
+      var text = shareText();
+      if (navigator.share) { navigator.share({ text: text }).catch(function () { /* closed */ }); return; }
+      var done = function () { setText('tomorrow', 'Copied · paste it anywhere'); setTimeout(function () { setText('tomorrow', 'New puzzles at midnight'); }, 2000); };
+      if (navigator.clipboard) navigator.clipboard.writeText(text).then(done, function () { /* blocked */ });
+    };
+    $('close').onclick = function () { history.replaceState(null, '', location.pathname); route(); };
+  }
+
+  // ---------- go
+  readColours();
+  if (/[?&]selftest/.test(location.search)) window.LT_TEST = { Crowns: Crowns, Suns: Suns, Paths: Paths };
+  var links = document.querySelectorAll('a[data-play]');
+  for (var i = 0; i < links.length; i++) links[i].href = PLAY + links[i].getAttribute('data-play');
+  if (VIEW === 'home') { homePage(); wireShare(); window.addEventListener('hashchange', route); }
+  else puzzlePage(VIEW);
+})();
