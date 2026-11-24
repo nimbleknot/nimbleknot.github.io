@@ -82,9 +82,18 @@ h1{font-size:40px;line-height:1.05;margin:2px 0 4px}
 .board svg{display:block;width:100%;height:100%}
 .count{text-align:center;color:var(--muted);font-size:16px;margin-top:18px;font-variant-numeric:tabular-nums}
 .tools{display:flex;justify-content:space-around;margin-top:26px}
-.tools button{display:flex;flex-direction:column;align-items:center;gap:2px;font-size:14px;min-width:64px;min-height:52px}
+.tools button{display:flex;flex-direction:column;align-items:center;gap:2px;font-size:14px;min-width:56px;min-height:52px}
 .tools button:disabled{opacity:.35;cursor:default}
 .next{margin-top:26px}
+.more{display:block;text-align:center;margin-top:18px;font-size:16px;font-weight:600;color:var(--primary);text-decoration:none;padding:6px}
+.tools button .mute,.tools button.off .on{display:none}
+.tools button.off .mute{display:block}
+.tools button.off{color:var(--muted)}
+/* a placed piece lands, as in the game: a crown drops in, a sun or moon flips open (settle 180 ms) */
+.lt-pop{animation:ltpop 180ms cubic-bezier(.2,1.5,.4,1)}
+@keyframes ltpop{from{transform:scale(.55)}to{transform:scale(1)}}
+.lt-flip{animation:ltflip 180ms ease-out}
+@keyframes ltflip{from{transform:scaleX(.15)}to{transform:scaleX(1)}}
 /* below the board (front door) */
 .below{margin-top:44px;padding-top:28px;border-top:1px solid var(--hair)}
 .below h2{font-size:26px;margin:0 0 6px}

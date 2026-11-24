@@ -107,6 +107,38 @@
     return '<span class="' + (small ? 'mk' : 'tile') + (off ? ' off' : '') + '" style="background:var(--t' + m.charAt(0).toUpperCase() + m.slice(1) + ');color:' + col + '">' + ICON[m] + '</span>';
   }
 
+  // ---------- sounds (the game's own, assets/sfx, as mp3) and the light buzz, both behind one switch
+  var AC = null, BUF = {}, SOUND = true;
+  try { SOUND = localStorage.getItem('lt-sound') !== '0'; } catch (e) { SOUND = true; }
+  var SFX_NAMES = ['place_crown', 'mark', 'ui_tap', 'place_sun', 'place_moon', 'path_step_1', 'path_step_2', 'path_step_3', 'path_step_4',
+    'path_step_5', 'path_back', 'waypoint', 'conflict', 'check_ok', 'check_bad', 'clear', 'solve'];
+  function loadSounds(base) {
+    try { AC = new (window.AudioContext || window.webkitAudioContext)(); } catch (e) { AC = null; return; }
+    SFX_NAMES.forEach(function (n) {
+      fetch(base + 'sfx/' + n + '.mp3').then(function (r) { return r.arrayBuffer(); })
+        .then(function (b) { AC.decodeAudioData(b, function (buf) { BUF[n] = buf; }, function () { /* skip */ }); })
+        .catch(function () { /* offline */ });
+    });
+  }
+  function sfx(n) {
+    if (!SOUND || !AC || !BUF[n]) return;
+    try {
+      if (AC.state === 'suspended') AC.resume();
+      var src = AC.createBufferSource(); src.buffer = BUF[n]; src.connect(AC.destination); src.start(0);
+    } catch (e) { /* ignore */ }
+  }
+  function buzz(ms) { if (SOUND && navigator.vibrate) { try { navigator.vibrate(ms); } catch (e) { /* ignore */ } } }
+
+  // ---------- a placed piece lands (board_view.dart: a crown drops in, a sun or moon flips open)
+  var POP = null; // { cell, kind: 'lt-pop' | 'lt-flip' } for the very next drawing only
+  function pop(i, cx, cy, inner) {
+    if (!POP || POP.cell !== i) return inner;
+    return '<g class="' + POP.kind + '" style="transform-origin:' + cx + 'px ' + cy + 'px">' + inner + '</g>';
+  }
+  // Mistakes show 0.7 s after the last change (session.dart _conflictDelayMs), so tapping
+  // through a sun on the way to a moon never flashes red.
+  var SHOWBAD = true;
+
   // ---------- the solve celebration, as the game draws it (board_view.dart: the wave and _burst)
   var ANIM = null; // { ms, n } while a solve plays
   function wave(i, n, cx, cy, inner) {
@@ -175,8 +207,17 @@
       var ra = Math.floor(a / n), rb = Math.floor(b / n), ca = a % n, cb = b % n;
       return ra === rb || ca === cb || reg[a] === reg[b] || (Math.abs(ra - rb) <= 1 && Math.abs(ca - cb) <= 1);
     }
+    function badOf(st) {
+      var crowns = [], bad = {}, i, k;
+      for (i = 0; i < n * n; i++) if (st.charAt(i) === '2') crowns.push(i);
+      for (i = 0; i < crowns.length; i++) for (k = i + 1; k < crowns.length; k++) if (clash(crowns[i], crowns[k])) { bad[crowns[i]] = 1; bad[crowns[k]] = 1; }
+      return bad;
+    }
     return {
       n: n, cells: n * n,
+      hasBad: function (st) { return Object.keys(badOf(st)).length > 0; },
+      kind: function (v) { return v === '2' ? 'place_crown' : v === '1' ? 'mark' : 'ui_tap'; },
+      popKind: 'lt-pop',
       blank: function () { var s = ''; for (var i = 0; i < n * n; i++) s += '0'; return s; },
       // 0 empty, 1 ×, 2 crown
       tap: function (st, i) { var v = (+st.charAt(i) + 1) % 3; return st.slice(0, i) + v + st.slice(i + 1); },
@@ -196,8 +237,7 @@
       draw: function (st, flash, won) {
         var c = B / n, o = '', crowns = [], i, k;
         for (i = 0; i < n * n; i++) if (st.charAt(i) === '2') crowns.push(i);
-        var bad = {}, auto = {};
-        for (i = 0; i < crowns.length; i++) for (k = i + 1; k < crowns.length; k++) if (clash(crowns[i], crowns[k])) { bad[crowns[i]] = 1; bad[crowns[k]] = 1; }
+        var bad = badOf(st), auto = {};
         for (i = 0; i < crowns.length; i++) for (k = 0; k < n * n; k++) if (k !== crowns[i] && st.charAt(k) !== '2' && clash(k, crowns[i])) auto[k] = 1;
         for (i = 0; i < n * n; i++) o += '<rect x="' + (i % n) * c + '" y="' + Math.floor(i / n) * c + '" width="' + (c + 0.5) + '" height="' + (c + 0.5) + '" fill="' + C.regions[reg[i] % 10] + '"/>';
         for (i = 1; i < n; i++) o += '<path d="M' + i * c + ' 0V' + B + 'M0 ' + i * c + 'H' + B + '" stroke="' + C['--grid'] + '"/>';
@@ -210,8 +250,8 @@
           var cx = (i % n) * c + c / 2, cy = Math.floor(i / n) * c + c / 2, v = st.charAt(i);
           var hot = flash && flash.indexOf(i) >= 0;
           if (hot) o += '<rect x="' + (cx - c / 2 + 3) + '" y="' + (cy - c / 2 + 3) + '" width="' + (c - 6) + '" height="' + (c - 6) + '" rx="6" fill="none" stroke="' + C['--error'] + '" stroke-width="3"/>';
-          if (v === '2') o += wave(i, n, cx, cy, crownSvg(cx, cy, c, bad[i] && !won ? C['--error'] : C['--ink']));
-          else if (v === '1') o += crossSvg(cx, cy, c, 0.85);
+          if (v === '2') o += pop(i, cx, cy, wave(i, n, cx, cy, crownSvg(cx, cy, c, bad[i] && !won && SHOWBAD ? C['--error'] : C['--ink'])));
+          else if (v === '1') o += pop(i, cx, cy, crossSvg(cx, cy, c, 0.85));
           else if (auto[i]) o += crossSvg(cx, cy, c, 0.45);
         }
         return o;
@@ -227,8 +267,27 @@
       if (m) links.push({ a: +m[1], b: +m[1] + (m[2] === 'R' ? 1 : n), right: m[2] === 'R', same: m[3] === '=' });
     });
     function given(i) { return p.g.charAt(i) !== '.'; }
+    function badOf(st) {
+      // rule breaks: three alike in a line, too many of one in a line, a broken = or ×
+      var bad = {};
+      function line(get) {
+        var cnt = { 1: 0, 2: 0 }, idx = [];
+        for (var k = 0; k < n; k++) { idx.push(get(k)); var v = st.charAt(get(k)); if (v !== '0') cnt[v]++; }
+        for (k = 0; k + 2 < n; k++) { var a = st.charAt(idx[k]); if (a !== '0' && a === st.charAt(idx[k + 1]) && a === st.charAt(idx[k + 2])) { bad[idx[k]] = bad[idx[k + 1]] = bad[idx[k + 2]] = 1; } }
+        ['1', '2'].forEach(function (v) { if (cnt[v] > n / 2) idx.forEach(function (j) { if (st.charAt(j) === v) bad[j] = 1; }); });
+      }
+      for (var r = 0; r < n; r++) { line(function (k) { return r * n + k; }); line(function (k) { return k * n + r; }); }
+      links.forEach(function (l) {
+        var a = st.charAt(l.a), b = st.charAt(l.b);
+        if (a !== '0' && b !== '0' && ((a === b) !== l.same)) { bad[l.a] = 1; bad[l.b] = 1; }
+      });
+      return bad;
+    }
     return {
       n: n, cells: n * n,
+      hasBad: function (st) { return Object.keys(badOf(st)).length > 0; },
+      kind: function (v) { return v === '1' ? 'place_sun' : v === '2' ? 'place_moon' : 'ui_tap'; },
+      popKind: 'lt-flip',
       // 0 empty, 1 sun, 2 moon (givens S / M)
       blank: function () { var s = ''; for (var i = 0; i < n * n; i++) s += p.g.charAt(i) === 'S' ? '1' : p.g.charAt(i) === 'M' ? '2' : '0'; return s; },
       tap: function (st, i) { if (given(i)) return st; var v = (+st.charAt(i) + 1) % 3; return st.slice(0, i) + v + st.slice(i + 1); },
@@ -237,25 +296,13 @@
       wrong: function (st) { var w = []; for (var i = 0; i < n * n; i++) if (st.charAt(i) !== '0' && +st.charAt(i) !== +p.s.charAt(i) + 1) w.push(i); return w; },
       draw: function (st, flash) {
         var c = B / n, o = '', i;
-        // rule breaks: three alike in a line, too many of one in a line, a broken = or ×
-        var bad = {};
-        function line(get) {
-          var cnt = { 1: 0, 2: 0 }, idx = [];
-          for (var k = 0; k < n; k++) { idx.push(get(k)); var v = st.charAt(get(k)); if (v !== '0') cnt[v]++; }
-          for (k = 0; k + 2 < n; k++) { var a = st.charAt(idx[k]); if (a !== '0' && a === st.charAt(idx[k + 1]) && a === st.charAt(idx[k + 2])) { bad[idx[k]] = bad[idx[k + 1]] = bad[idx[k + 2]] = 1; } }
-          ['1', '2'].forEach(function (v) { if (cnt[v] > n / 2) idx.forEach(function (j) { if (st.charAt(j) === v) bad[j] = 1; }); });
-        }
-        for (var r = 0; r < n; r++) { line(function (k) { return r * n + k; }); line(function (k) { return k * n + r; }); }
-        links.forEach(function (l) {
-          var a = st.charAt(l.a), b = st.charAt(l.b);
-          if (a !== '0' && b !== '0' && ((a === b) !== l.same)) { bad[l.a] = 1; bad[l.b] = 1; }
-        });
+        var bad = badOf(st);
         for (i = 0; i < n * n; i++) if (given(i)) o += '<rect x="' + (i % n) * c + '" y="' + Math.floor(i / n) * c + '" width="' + c + '" height="' + c + '" fill="' + C['--given'] + '"/>';
         for (i = 1; i < n; i++) o += '<path d="M' + i * c + ' 0V' + B + 'M0 ' + i * c + 'H' + B + '" stroke="' + C['--grid'] + '"/>';
         for (i = 0; i < n * n; i++) {
           var x = (i % n) * c + c / 2, y = Math.floor(i / n) * c + c / 2, v = st.charAt(i);
-          if (bad[i] || (flash && flash.indexOf(i) >= 0)) o += '<rect x="' + (x - c / 2 + 3) + '" y="' + (y - c / 2 + 3) + '" width="' + (c - 6) + '" height="' + (c - 6) + '" rx="6" fill="none" stroke="' + C['--error'] + '" stroke-width="3"/>';
-          if (v === '1') o += wave(i, n, x, y, sunSvg(x, y, c)); else if (v === '2') o += wave(i, n, x, y, moonSvg(x, y, c, 'mm' + i));
+          if ((SHOWBAD && bad[i]) || (flash && flash.indexOf(i) >= 0)) o += '<rect x="' + (x - c / 2 + 3) + '" y="' + (y - c / 2 + 3) + '" width="' + (c - 6) + '" height="' + (c - 6) + '" rx="6" fill="none" stroke="' + C['--error'] + '" stroke-width="3"/>';
+          if (v === '1') o += pop(i, x, y, wave(i, n, x, y, sunSvg(x, y, c))); else if (v === '2') o += pop(i, x, y, wave(i, n, x, y, moonSvg(x, y, c, 'mm' + i)));
         }
         links.forEach(function (l) {
           var x = (l.a % n) * c, y = Math.floor(l.a / n) * c;
@@ -289,6 +336,8 @@
     function nextNumber(path) { var k = 0; path.forEach(function (c) { if (wp(c) === k) k++; }); return k; }
     var api = {
       n: n, cells: n * n, isPaths: true,
+      hasBad: function () { return false; },
+      isNumber: function (c) { return wp(c) >= 0; },
       blank: function () { return ''; },
       parse: parse,
       // add a cell to the line (or take steps back); returns the new state or null when refused
@@ -392,11 +441,23 @@
     }
     function render() {
       svg.innerHTML = g.draw(st, flash, rec.done) + burst();
+      POP = null;
       setText('count', g.count(st));
       $('undo').disabled = rec.done || !undo.length;
       $('redo').disabled = rec.done || !redo.length;
       $('clear').disabled = rec.done || st === g.blank();
       $('check').disabled = rec.done;
+    }
+    var badTimer = null;
+    function changed(cell) {
+      if (cell >= 0 && !g.isPaths) POP = { cell: cell, kind: g.popKind };
+      SHOWBAD = false;
+      clearTimeout(badTimer);
+      badTimer = setTimeout(function () {
+        SHOWBAD = true;
+        if (!rec.done && g.hasBad(st)) { sfx('conflict'); buzz(20); }
+        render();
+      }, 700);
     }
     function commit(next) {
       if (next === null || next === st) return false;
@@ -409,6 +470,8 @@
     }
     function win() {
       stopClock();
+      clearTimeout(badTimer); SHOWBAD = true;
+      sfx('solve'); buzz(30);
       rec.done = true; rec.t = elapsed; rec.st = st; persist();
       gc('solved-' + mode, 'Solved ' + NAMES[mode], true);
       if (allDone()) gc('page-complete', 'All three solved', true);
@@ -430,6 +493,7 @@
     }
     function showDone() {
       $('tools').hidden = true;
+      $('more').hidden = false;
       var nx = nextOpen(mode), a = $('next');
       a.hidden = false;
       if (nx) { a.textContent = 'Next: ' + NAMES[nx]; a.href = ROOT + SLUG[nx] + '/'; }
@@ -444,7 +508,15 @@
       return Math.floor(y * g.n) * g.n + Math.floor(x * g.n);
     }
     if (g.isPaths) {
-      var dragging = false, dragStartSt = null;
+      var dragging = false, dragStartSt = null, refused = -1;
+      var pathSound = function (before) {
+        var path = g.parse(st);
+        if (path.length < before) { sfx('path_back'); buzz(8); return; }
+        if (path.length === before) return;
+        var end = path[path.length - 1];
+        if (g.isNumber(end)) { sfx('waypoint'); buzz(12); }
+        else { sfx('path_step_' + Math.min(5, Math.floor(path.length * 5 / g.cells) + 1)); buzz(6); }
+      };
       boardEl.addEventListener('pointerdown', function (ev) {
         if (rec.done) return;
         var i = cellAt(ev); if (i < 0) return;
@@ -455,13 +527,16 @@
         if (next === null) return;
         dragging = true; dragStartSt = st;
         try { boardEl.setPointerCapture(ev.pointerId); } catch (e) { /* ignore */ }
-        if (next !== st) { st = next; rec.st = st; startClock(); render(); }
+        if (AC && AC.state === 'suspended') AC.resume();
+        var before = g.parse(st).length;
+        if (next !== st) { st = next; rec.st = st; startClock(); pathSound(before); render(); }
+        refused = -1;
         ev.preventDefault();
       });
       boardEl.addEventListener('pointermove', function (ev) {
         if (!dragging) return;
         var i = cellAt(ev); if (i < 0) return;
-        var guard = 0;
+        var guard = 0, before = g.parse(st).length;
         // walk one cell at a time towards the finger, so a fast drag never skips a cell
         while (g.end(st) !== i && guard++ < g.cells) {
           var e = g.end(st), er = Math.floor(e / g.n), ec = e % g.n, tr = Math.floor(i / g.n), tc = i % g.n;
@@ -469,9 +544,14 @@
           var to = Math.abs(tr - er) >= Math.abs(tc - ec) ? e + (tr > er ? g.n : -g.n) : e + (tc > ec ? 1 : -1);
           if (path.indexOf(i) >= 0 && path.indexOf(i) < path.length - 1 && to !== back) { to = i; }
           var next = g.step(st, to);
-          if (next === null || next === st) break;
+          if (next === null) {
+            if (g.isNumber(to) && refused !== to) { refused = to; sfx('conflict'); buzz(20); } // a number out of order says no, once
+            break;
+          }
+          if (next === st) break;
           st = next; rec.st = st;
         }
+        pathSound(before);
         render();
       });
       var endDrag = function () {
@@ -486,12 +566,52 @@
       boardEl.addEventListener('pointerup', endDrag);
       boardEl.addEventListener('pointercancel', endDrag);
     } else {
+      var down = -1, gestureStart = null, painting = false, erasing = false, lastTap = { cell: -1, ms: 0 };
+      var paint = function (c) {
+        var v = st.charAt(c);
+        if (erasing ? v !== '1' : v !== '0') return;
+        st = st.slice(0, c) + (erasing ? '0' : '1') + st.slice(c + 1);
+        sfx(erasing ? 'ui_tap' : 'mark'); buzz(6);
+        changed(c); render();
+      };
       boardEl.addEventListener('pointerdown', function (ev) {
         if (rec.done) return;
         var i = cellAt(ev); if (i < 0) return;
-        commit(g.tap(st, i));
+        down = i; gestureStart = st; painting = false;
+        try { boardEl.setPointerCapture(ev.pointerId); } catch (e) { /* ignore */ }
+        if (AC && AC.state === 'suspended') AC.resume();
         ev.preventDefault();
       });
+      boardEl.addEventListener('pointermove', function (ev) {
+        if (down < 0 || mode !== 'crowns') return;
+        var i = cellAt(ev); if (i < 0) return;
+        if (!painting && i !== down && st.charAt(down) !== '2') {
+          painting = true; erasing = st.charAt(down) === '1';
+          paint(down);
+        }
+        if (painting) paint(i);
+      });
+      var up = function (ev) {
+        if (down < 0) return;
+        var cell = down; down = -1;
+        if (ev.type === 'pointerup' && !painting) {
+          var t = Date.now();
+          if (!(cell === lastTap.cell && t - lastTap.ms < 60)) { // debounce, as the app
+            lastTap = { cell: cell, ms: t };
+            var nx = g.tap(st, cell);
+            if (nx !== st) { st = nx; sfx(g.kind(st.charAt(cell))); buzz(8); changed(cell); }
+          }
+        }
+        painting = false;
+        if (st !== gestureStart) {
+          undo.push(gestureStart); redo = [];
+          rec.st = st; startClock();
+          if (g.solved(st)) win(); else { rec.t = now(); persist(); }
+        }
+        render();
+      };
+      boardEl.addEventListener('pointerup', up);
+      boardEl.addEventListener('pointercancel', up);
     }
     // keyboard: arrows move a focus ring, Space / Enter acts (Crowns, Suns & Moons)
     boardEl.tabIndex = 0;
@@ -513,11 +633,25 @@
 
     $('undo').onclick = function () { if (!undo.length) return; redo.push(st); st = undo.pop(); rec.st = st; persist(); render(); };
     $('redo').onclick = function () { if (!redo.length) return; undo.push(st); st = redo.pop(); rec.st = st; persist(); if (g.solved(st)) win(); render(); };
-    $('clear').onclick = function () { if (commit(g.blank())) message('Cleared · Undo brings it back'); };
+    $('clear').onclick = function () { if (commit(g.blank())) { sfx('clear'); message('Cleared · Undo brings it back'); } };
+    var soundBtn = $('sound');
+    var showSound = function () {
+      soundBtn.classList.toggle('off', !SOUND);
+      soundBtn.querySelector('span').textContent = SOUND ? 'Sound' : 'Muted';
+      soundBtn.setAttribute('aria-pressed', String(SOUND));
+    };
+    soundBtn.onclick = function () {
+      SOUND = !SOUND;
+      try { localStorage.setItem('lt-sound', SOUND ? '1' : '0'); } catch (e) { /* ignore */ }
+      showSound(); if (SOUND) sfx('ui_tap');
+    };
+    showSound();
+    loadSounds(ROOT);
     $('check').onclick = function () {
       var w = g.wrong(st);
       clearTimeout(flashTimer);
-      if (!w.length) { message('All good so far'); return; }
+      if (!w.length) { sfx('check_ok'); message('All good so far'); return; }
+      sfx('check_bad'); buzz(20);
       flash = w.slice(0, 3);
       message(w.length === 1 ? '1 cell is wrong' : w.length + ' cells are wrong');
       render();
