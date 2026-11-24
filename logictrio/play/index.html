@@ -1,140 +1,90 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Play Logic Trio on Android — Nimbleknot</title>
-<meta name="description" content="Logic Trio is on Google Play: three logic puzzles, a new page every day. For Android phones.">
-<meta property="og:type" content="website">
-<meta property="og:site_name" content="Nimbleknot">
-<meta property="og:title" content="Play Logic Trio">
-<meta property="og:description" content="Three logic puzzles, a new page every day. On Google Play, for Android.">
+<title>Get Logic Trio on Google Play | Nimbleknot</title>
+<meta name="description" content="Logic Trio: three new logic puzzles every day. Free on Google Play for Android. On an iPhone or a computer, play today's puzzles in your browser.">
+<link rel="canonical" href="https://nimbleknot.github.io/logictrio/play/">
+<meta property="og:title" content="Logic Trio: three new logic puzzles every day">
+<meta property="og:description" content="Free on Google Play. Or play today's puzzles in your browser.">
 <meta property="og:url" content="https://nimbleknot.github.io/logictrio/play/">
-<meta property="og:image" content="https://nimbleknot.github.io/logictrio/play/preview.png">
-<meta property="og:image:width" content="1024">
-<meta property="og:image:height" content="500">
+<meta property="og:image" content="https://nimbleknot.github.io/logictrio/today/img/share-today.png">
 <meta name="twitter:card" content="summary_large_image">
-<!--
-  The one address every video, channel link and post points to.
-  One button to the store page. No scripts, no analytics, no cookies, no redirect.
--->
+<meta name="theme-color" content="#FAF7F2" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#12141C" media="(prefers-color-scheme: dark)">
+<link rel="icon" href="../icon-512.png">
+<script>
+/* The smart link (D-251): Android goes on to Google Play from here; an iPhone or a computer
+   cannot install the app, so it goes straight to today's puzzles in the browser. */
+(function () {
+  var ua = navigator.userAgent || '';
+  if (!/Android/i.test(ua) && !/[?&]stay\b/.test(location.search)) location.replace('../today/' + location.search);
+})();
+</script>
+<link rel="stylesheet" href="../today/app.css?v=fec3c973">
 <style>
-  :root {
-    color-scheme: light dark;
-    --paper: #FAF7F2;
-    --surface: #FFFFFF;
-    --ink: #1F2433;
-    --ink-muted: #5A5F6E;
-    --accent: #B86E00;
-    --accent-line: #F2A93B;
-    --rule: #E3DCD1;
-    --button: #1F2433;
-    --button-ink: #FFFFFF;
-  }
-  @media (prefers-color-scheme: dark) {
-    :root {
-      --paper: #12141C;
-      --surface: #1C1F2B;
-      --ink: #ECEEF5;
-      --ink-muted: #9AA0B4;
-      --accent: #FFBE5C;
-      --accent-line: #FFBE5C;
-      --rule: #2E3242;
-      --button: #FFBE5C;
-      --button-ink: #12141C;
-    }
-  }
-  * { box-sizing: border-box; }
-  html { -webkit-text-size-adjust: 100%; }
-  body {
-    background: var(--paper);
-    color: var(--ink);
-    font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-    font-size: 17px;
-    line-height: 1.6;
-    margin: 0;
-    padding: 0 16px 72px;
-    overflow-wrap: break-word;
-  }
-  .page { max-width: 34rem; margin: 0 auto; }
-  .masthead { padding-top: 32px; }
-  .wordmark {
-    font-family: Georgia, "Iowan Old Style", "Times New Roman", Times, serif;
-    font-size: 0.95rem; letter-spacing: 0.14em; text-transform: uppercase;
-    color: var(--ink-muted); margin: 0;
-  }
-  .wordmark a { color: inherit; text-decoration: none; }
-  h1, h2 { font-family: Georgia, "Iowan Old Style", "Times New Roman", Times, serif; font-weight: 600; line-height: 1.25; }
-  h1 { font-size: 2.1rem; margin: 18px 0 6px; letter-spacing: -0.01em; }
-  h2 { font-size: 1.25rem; margin: 44px 0 12px; padding-top: 24px; border-top: 1px solid var(--rule); }
-  .standfirst { color: var(--ink-muted); margin: 0 0 6px; }
-  .accent-rule { width: 56px; height: 3px; background: var(--accent-line); margin: 20px 0 24px; }
-  p { margin: 0 0 1em; }
-  .notice {
-    background: var(--surface); border: 1px solid var(--rule); border-left: 3px solid var(--accent-line);
-    padding: 14px 16px; margin: 0 0 14px;
-  }
-  .notice p:last-child { margin-bottom: 0; }
-  .cta { margin: 26px 0 18px; }
-  .button {
-    display: block; text-align: center; text-decoration: none;
-    background: var(--button); color: var(--button-ink);
-    font-weight: 600; font-size: 1.08rem; line-height: 1.3;
-    padding: 15px 18px; border-radius: 12px; margin: 0 0 10px; min-height: 52px;
-  }
-  .button:hover { opacity: 0.92; color: var(--button-ink); }
-  .button:focus-visible { outline: 3px solid var(--accent); outline-offset: 3px; }
-  .note { color: var(--ink-muted); font-size: 0.96rem; margin: 0; }
-  a { color: var(--ink); text-decoration: underline; text-decoration-color: var(--accent-line); text-decoration-thickness: 2px; text-underline-offset: 3px; }
-  a:hover { color: var(--accent); }
-  .rules p { margin: 0 0 0.7em; }
-  footer { margin-top: 52px; padding-top: 24px; border-top: 1px solid var(--rule); color: var(--ink-muted); font-size: 0.95rem; }
-  footer p { margin: 0 0 0.5em; }
+.play{max-width:440px;margin:0 auto;padding:28px 20px 32px;text-align:center}
+.play .icon{width:104px;height:104px;border-radius:24px;box-shadow:0 14px 30px rgba(31,36,51,.18);display:block;margin:12px auto 0}
+.play h1{font-size:44px;margin:18px 0 4px}
+.play .sub{font-size:17px;color:var(--muted);margin:0}
+.play .main{margin-top:26px}
+.play .small{font-size:14px;color:var(--muted);margin:10px 0 0}
+.play .web{display:inline-block;margin-top:18px;font-size:16px;font-weight:600;color:var(--primary);text-decoration:none;padding:8px}
+.play .strip{margin-top:26px}
+.play .tip{margin-top:26px;text-align:left;font-size:15px;line-height:1.45;color:var(--muted);background:var(--surface);border-radius:16px;padding:14px 16px;box-shadow:0 0 0 1px var(--hair)}
+.play .tip b{color:var(--ink)}
 </style>
 </head>
 <body>
-<div class="page">
-
-  <header class="masthead">
-    <p class="wordmark"><a href="../">Nimbleknot &middot; Logic Trio</a></p>
-  </header>
-
-  <main>
-    <h1>Play Logic Trio</h1>
-    <p class="standfirst">Three logic puzzles, a new page every day.</p>
-    <div class="accent-rule"></div>
-
-    <p>Logic Trio is on Google Play, for Android phones (Android&nbsp;7 or newer).</p>
-    <p class="note">iPhone: Logic Trio is Android only for now.</p>
-
-    <div class="cta">
-      <a class="button" href="https://play.google.com/store/apps/details?id=com.nimbleknot.logictrio">Open in Google Play</a>
-    </div>
-
-    <div class="notice">
-      <p><strong>Opened this inside LinkedIn, Discord, Instagram or another app,</strong> and the button shows a web page instead of the Play Store? Tap &#8942; (or the share icon), choose <strong>Open in Chrome</strong> or <strong>Open in browser</strong>, and tap the button again. Searching the Play Store works too: look for <strong>Logic Trio: Daily Puzzles</strong> by <strong>Nimbleknot</strong> (other games share the name).</p>
-    </div>
-
-    <h2>On a computer</h2>
-    <p>The button opens Google Play in your browser. Sign in with the Google account your phone uses, choose <strong>Install</strong>, and pick your phone.</p>
-
-    <h2>What it is</h2>
-    <div class="rules">
-      <p><strong>Crowns:</strong> one crown in every row, column and colour, and crowns never touch.</p>
-      <p><strong>Suns &amp; Moons:</strong> as many suns as moons in every row and column, never three alike in a row.</p>
-      <p><strong>Paths:</strong> one line through every cell, passing the numbers in order.</p>
-    </div>
-    <p>Every puzzle has exactly one solution. Solve one a day to keep your streak. No lives, and nothing counts down. Works offline. Free, with ads, and no ad ever interrupts a puzzle.</p>
-    <p>Want to see it first? <a href="https://www.youtube.com/watch?v=UbbXPKUDISQ" target="_blank" rel="noopener">Watch it in one minute on YouTube</a>, and try the puzzle challenges on <a href="https://www.youtube.com/@nimbleknot" target="_blank" rel="noopener">@nimbleknot</a>.</p>
-    <p class="note">Tested it with us? Thank you. There is nothing to do: the game you have keeps updating from Google Play.</p>
-    <p><a href="../">More about Logic Trio</a></p>
-  </main>
-
-  <footer>
-    <p><a href="../privacy.html">Privacy policy</a> &middot; <a href="../terms.html">Terms of use</a> &middot; <a href="../delete-data.html">Delete your data</a></p>
-    <p>Nimbleknot &mdash; <a href="mailto:nimbleknot.games@gmail.com">nimbleknot.games@gmail.com</a></p>
-  </footer>
-
-</div>
+<main class="play" data-gc="https://nimbleknot.goatcounter.com/count">
+  <img class="icon" src="../icon-512.png" alt="Logic Trio" width="104" height="104">
+  <h1 class="disp">Logic Trio</h1>
+  <p class="sub">Three new logic puzzles every day</p>
+  <a class="main" id="store" href="https://play.google.com/store/apps/details?id=com.nimbleknot.logictrio">Get it on Google Play</a>
+  <p class="small">Free · Android 7 or newer</p>
+  <a class="web" id="web" href="../today/">or play today's puzzles in your browser</a>
+  <div class="strip" id="strip" aria-hidden="true"></div>
+  <p class="tip"><b>Opened this inside Instagram, Facebook or another app</b> and the button shows a web page instead of the Play Store? Tap ⋮ (or the share icon), choose <b>Open in Chrome</b> (or "Open in browser"), then tap the button again. Or search the Play Store for <b>Logic Trio: Daily Puzzles</b> by <b>Nimbleknot</b>.</p>
+  <div class="foot"><a href="../">Nimbleknot</a><a href="../today/">Today's puzzles</a><a href="../privacy.html">Privacy</a><a href="../terms.html">Terms</a></div>
+</main>
+<script src="../today/days.js?v=fec3c973"></script>
+<script>
+(function () {
+  'use strict';
+  var q = location.search;
+  // the source of this visit (?utm_source=instagram on our profile links) goes into the Play link's campaign
+  var m = /[?&](?:utm_source|source)=([a-z0-9_-]{1,24})/i.exec(q), src = m ? m[1].toLowerCase() : '';
+  var camp = (src ? src + '_' : '') + 'play';
+  document.getElementById('store').href = 'https://play.google.com/store/apps/details?id=com.nimbleknot.logictrio&referrer=utm_source%3D' +
+    (src || 'website') + '%26utm_medium%3Dprofile%26utm_campaign%3D' + camp;
+  document.getElementById('web').href = '../today/' + q;
+  // six of the latest day pictures, as on today's page
+  try {
+    var d = window.LT_DAYS.d, keys = Object.keys(d).sort(), t = new Date();
+    var today = t.getFullYear() + '-' + ('0' + (t.getMonth() + 1)).slice(-2) + '-' + ('0' + t.getDate()).slice(-2), shown = [];
+    for (var i = keys.length - 1; i >= 0 && shown.length < 6; i--) if (keys[i] < today && d[keys[i]].pic) shown.unshift(d[keys[i]].pic);
+    if (shown.length) {
+      var s = document.getElementById('strip');
+      s.style.gridTemplateColumns = 'repeat(' + shown.length + ',1fr)';
+      s.innerHTML = shown.map(function (p) { return '<div class="day"><span class="pt"><img src="../today/pictures/day_' + p.key + '.png" alt=""></span></div>'; }).join('');
+    }
+  } catch (e) { /* no pictures */ }
+  // the visit counter (GoatCounter, D-250): no cookies, no IP kept
+  var GC = document.querySelector('[data-gc]').getAttribute('data-gc');
+  function gc(path, title, ev) {
+    if (!GC || /^(localhost|127\.|192\.168\.|10\.)/.test(location.hostname) || navigator.webdriver) return;
+    var p = { p: path, t: title, e: ev ? 'true' : '', s: String(screen.width), rnd: Math.random().toString(36).slice(2, 7) };
+    if (!ev) { p.r = document.referrer; p.q = q; }
+    var parts = []; for (var k in p) if (p[k]) parts.push(k + '=' + encodeURIComponent(p[k]));
+    var url = GC + '?' + parts.join('&');
+    try { if (navigator.sendBeacon && navigator.sendBeacon(url)) return; } catch (e) { /* fall back */ }
+    new Image().src = url;
+  }
+  gc(location.pathname, document.title, false);
+  document.getElementById('store').addEventListener('click', function () { gc('app-' + camp, 'App button (play page)', true); });
+  document.getElementById('web').addEventListener('click', function () { gc('web-from-play', 'To the web puzzles (play page)', true); });
+})();
+</script>
 </body>
 </html>
