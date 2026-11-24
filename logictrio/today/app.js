@@ -338,8 +338,9 @@
       n: n, cells: n * n, isPaths: true,
       hasBad: function () { return false; },
       isNumber: function (c) { return wp(c) >= 0; },
-      blank: function () { return ''; },
+      blank: function () { return String(p.w[0]); },
       parse: parse,
+      wpIndex: wp,
       // add a cell to the line (or take steps back); returns the new state or null when refused
       step: function (st, to) {
         var path = parse(st);
@@ -406,7 +407,7 @@
     var p = PUZ[mode];
     var g = mode === 'crowns' ? Crowns(p) : mode === 'suns' ? Suns(p) : Paths(p);
     var rec = saved[mode];
-    var st = rec.st !== null && rec.st !== undefined ? rec.st : g.blank();
+    var st = rec.st !== null && rec.st !== undefined && rec.st !== '' ? rec.st : g.blank();
     var undo = [], redo = [], elapsed = rec.t || 0, startedAt = null, ticker = null, flash = null, flashTimer = null, msgTimer = null;
     var boardEl = $('board'), svg;
 
@@ -508,57 +509,102 @@
       return Math.floor(y * g.n) * g.n + Math.floor(x * g.n);
     }
     if (g.isPaths) {
-      var dragging = false, dragStartSt = null, refused = -1;
-      var pathSound = function (before) {
-        var path = g.parse(st);
-        if (path.length < before) { sfx('path_back'); buzz(8); return; }
-        if (path.length === before) return;
-        var end = path[path.length - 1];
+      // Paths input, ported from the app (session.dart _pathsTouch, pathsDragTo; F-007, F-026, F-042).
+      var ENTER = 0.65, CUT_MARGIN = 0.25, CUT_REACH = 3, REFUSE_DEPTH = 0.5 + CUT_MARGIN;
+      var line = function () { return g.parse(st); };
+      var setLine = function (a) { st = a.join('.'); rec.st = st; };
+      var gesture = null, dragFar = false, refusedAt = -1;
+      var stepSound = function (a) {
+        var end = a[a.length - 1];
         if (g.isNumber(end)) { sfx('waypoint'); buzz(12); }
-        else { sfx('path_step_' + Math.min(5, Math.floor(path.length * 5 / g.cells) + 1)); buzz(6); }
+        else { sfx('path_step_' + Math.min(5, Math.floor(a.length * 5 / g.cells) + 1)); buzz(6); }
+      };
+      // open | line | wall | pastEnd | wrongNumber
+      var mayEnter = function (a, head, next) {
+        if (a.indexOf(next) >= 0) return 'line';
+        if (!g.canStep(head, next)) return 'wall';
+        if (head === PUZ.paths.w[PUZ.paths.w.length - 1]) return 'pastEnd';
+        var num = g.wpIndex(next);
+        if (num < 0) return 'open';
+        var reached = 0; a.forEach(function (c) { if (g.wpIndex(c) >= 0) reached++; });
+        return num === reached ? 'open' : 'wrongNumber';
+      };
+      var canEnter = function (a, head, next, sayShut) {
+        var e = mayEnter(a, head, next);
+        if (e === 'open') return true;
+        if (e !== 'wrongNumber' && !sayShut) return false;
+        if (refusedAt !== next) { refusedAt = next; sfx('conflict'); buzz(20); }
+        return false;
+      };
+      var cellOf = function (ev) {
+        var r = svg.getBoundingClientRect();
+        return { x: (ev.clientX - r.left) / r.width * g.n, y: (ev.clientY - r.top) / r.height * g.n };
       };
       boardEl.addEventListener('pointerdown', function (ev) {
         if (rec.done) return;
         var i = cellAt(ev); if (i < 0) return;
-        var path = g.parse(st), next = null;
-        if (path.indexOf(i) >= 0) next = g.step(st, i);                 // back to a cell on the line
-        else if (path.length && g.step(st, i) !== null) next = g.step(st, i); // one step on from the end
-        else if (i === PUZ.paths.w[0]) next = String(i);                 // start again from 1
-        if (next === null) return;
-        dragging = true; dragStartSt = st;
-        try { boardEl.setPointerCapture(ev.pointerId); } catch (e) { /* ignore */ }
         if (AC && AC.state === 'suspended') AC.resume();
-        var before = g.parse(st).length;
-        if (next !== st) { st = next; rec.st = st; startClock(); pathSound(before); render(); }
-        refused = -1;
+        try { boardEl.setPointerCapture(ev.pointerId); } catch (e) { /* ignore */ }
+        gesture = st; refusedAt = -1;
+        var a = line(), at = a.indexOf(i), n = g.n;
+        if (at >= 0) {
+          // a touch on the line cuts it back to that cell, however far back
+          if (at < a.length - 1) { setLine(a.slice(0, at + 1)); sfx('path_back'); buzz(8); }
+        } else {
+          var head = a[a.length - 1], dr = Math.floor(i / n) - Math.floor(head / n), dc = i % n - head % n;
+          if (Math.abs(dr) + Math.abs(dc) === 1 && canEnter(a, head, i, true)) { a.push(i); setLine(a); stepSound(a); }
+        }
+        var h = line()[line().length - 1];
+        dragFar = line().indexOf(i) < 0 && (Math.abs(Math.floor(i / g.n) - Math.floor(h / g.n)) > 2 || Math.abs(i % g.n - h % g.n) > 2);
+        startClock(); render();
         ev.preventDefault();
       });
       boardEl.addEventListener('pointermove', function (ev) {
-        if (!dragging) return;
-        var i = cellAt(ev); if (i < 0) return;
-        var guard = 0, before = g.parse(st).length;
-        // walk one cell at a time towards the finger, so a fast drag never skips a cell
-        while (g.end(st) !== i && guard++ < g.cells) {
-          var e = g.end(st), er = Math.floor(e / g.n), ec = e % g.n, tr = Math.floor(i / g.n), tc = i % g.n;
-          var path = g.parse(st), back = path.length > 1 ? path[path.length - 2] : -1;
-          var to = Math.abs(tr - er) >= Math.abs(tc - ec) ? e + (tr > er ? g.n : -g.n) : e + (tc > ec ? 1 : -1);
-          if (path.indexOf(i) >= 0 && path.indexOf(i) < path.length - 1 && to !== back) { to = i; }
-          var next = g.step(st, to);
-          if (next === null) {
-            if (g.isNumber(to) && refused !== to) { refused = to; sfx('conflict'); buzz(20); } // a number out of order says no, once
-            break;
+        if (gesture === null || rec.done) return;
+        var pos = cellOf(ev), x = pos.x, y = pos.y, n = g.n, a = line();
+        var col = Math.floor(x), row = Math.floor(y);
+        if (col >= 0 && row >= 0 && col < n && row < n) {
+          var at = a.indexOf(row * n + col), inX = x - col, inY = y - row;
+          var wellInside = inX >= CUT_MARGIN && inX <= 1 - CUT_MARGIN && inY >= CUT_MARGIN && inY <= 1 - CUT_MARGIN;
+          if (at >= 0 && at < a.length - 1 && wellInside && a.length - 1 - at <= CUT_REACH) {
+            setLine(a.slice(0, at + 1)); dragFar = false; sfx('path_back'); buzz(8); render();
+            return;
           }
-          if (next === st) break;
-          st = next; rec.st = st;
         }
-        pathSound(before);
-        render();
+        if (dragFar) return;
+        var guard = 2 * n, moved = false;
+        while (guard-- > 0) {
+          a = line();
+          var head = a[a.length - 1];
+          var dx = x - (head % n + 0.5), dy = y - (Math.floor(head / n) + 0.5);
+          var wantsX = Math.abs(dx) >= ENTER, wantsY = Math.abs(dy) >= ENTER;
+          if (!wantsX && !wantsY) break;
+          var towards = function (horizontal) {
+            if (horizontal) { var c = head % n + (dx > 0 ? 1 : -1); return c < 0 || c >= n ? null : head + (dx > 0 ? 1 : -1); }
+            var r2 = Math.floor(head / n) + (dy > 0 ? 1 : -1); return r2 < 0 || r2 >= n ? null : head + (dy > 0 ? n : -n);
+          };
+          var first = Math.abs(dx) >= Math.abs(dy), wanted = [];
+          [first, !first].forEach(function (hz) { if (hz ? wantsX : wantsY) { var t = towards(hz); if (t !== null) wanted.push(t); } });
+          var stepped = false;
+          for (var k = 0; k < wanted.length; k++) {
+            var next = wanted[k];
+            if (a.length > 1 && next === a[a.length - 2]) { a.pop(); setLine(a); sfx('path_back'); buzz(8); stepped = true; break; }
+            if (mayEnter(a, head, next) === 'open') { a.push(next); setLine(a); stepSound(a); refusedAt = -1; stepped = true; break; }
+          }
+          if (stepped) { moved = true; continue; }
+          if (wanted.length) {
+            var depth = Math.abs(wanted[0] - head) === 1 ? Math.abs(dx) : Math.abs(dy);
+            canEnter(a, head, wanted[0], depth >= REFUSE_DEPTH);
+          }
+          break;
+        }
+        if (moved) render();
       });
       var endDrag = function () {
-        if (!dragging) return;
-        dragging = false;
-        if (st !== dragStartSt) {
-          undo.push(dragStartSt); redo = [];
+        if (gesture === null) return;
+        var before = gesture; gesture = null; dragFar = false;
+        if (st !== before) {
+          undo.push(before); redo = [];
           if (g.solved(st)) win(); else { rec.t = now(); persist(); }
           render();
         }
